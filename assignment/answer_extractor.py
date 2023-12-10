@@ -1,7 +1,8 @@
 import stanza
-from question_classifier import *
 
-# 示例数据
+from assignment.question_classifier import *
+
+# test
 questions = "Is Rome the capital of Italy?"
 
 answers = ("surely it is but many don’t know this fact that Italy was not always called as Italy. Before Italy came "
@@ -14,9 +15,8 @@ nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma,ner')  # ini
 
 
 def recognite(text):
-	# 处理文本
 	doc = nlp(text)
-	# 提取命名实体
+
 	for sentence in doc.sentences:
 		print(sentence)
 		for entity in sentence.ents:
@@ -34,4 +34,3 @@ if classify_question(questions) == 0:
 else:
 	# todo: boolean question
 	pass
-
