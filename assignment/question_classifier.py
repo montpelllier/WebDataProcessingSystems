@@ -1,9 +1,6 @@
 # Load model directly
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-text1 = "Is Rome the capital of Italy?"
-text2 = "why sky is blue?"
-
 
 def classify_question(text):
 	# 0: open question; 1: boolean question
@@ -18,14 +15,29 @@ def classify_question(text):
 
 
 if __name__ == "__main__":
-	q_type = classify_question(text1)
-	if q_type == 0:
-		print("open question")
-	elif q_type == 1:
-		print("boolean question")
+	# simple questions, perform well
+	q1 = "Is Rome the capital of Italy?"
+	q2 = "Why sky is blue?"
+	# questions with option, not good
+	q3 = "Is Kosovo a country or a region or others?"
+	q4 = "Did USA win the world war II or Germany win?"
+	q5 = "Determine which one is correct: A, B, C or D?"
+	# questions without Interrogative pronouns, bad
+	q6 = "Tell the reason that sky is blue."
+	q7 = "distance between earth and moon?"
+	# open questions with be, do, can, should...
+	q8 = "how are you?"
+	q9 = "The method that is able to make a time machine?"
+	q10 = "The method to make a time machine?"
+	q11 = "can you pass the exam?"
+	q12 = "how can we extract answer entities from an answer text?"
+	q13 = "when is time machine invented?"
+	questions = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13]
 
-	q_type = classify_question(text2)
-	if q_type == 0:
-		print("open question")
-	elif q_type == 1:
-		print("boolean question")
+	for q in questions:
+		q_type = classify_question(q)
+		print(q)
+		if q_type == 0:
+			print("open question")
+		elif q_type == 1:
+			print("boolean question")
