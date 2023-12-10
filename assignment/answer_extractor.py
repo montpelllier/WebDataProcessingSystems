@@ -15,10 +15,11 @@ def recognite(doc):
 def extract_answer(question, ans_doc):
 	# print(q_doc)
 	if classify_question(question) == 0:
-		# todo: open question
+		# open question. select from entity candidates
 		print("open question")
+		# check type, similarity...
 	else:
-		# todo: boolean question. using keyword?
+		# boolean question. use keyword
 		print("boolean question")
 		# ans_sentences = [sentence.text for sentence in ans_doc.sentences]
 		pair_list = [(question, answer_sentence.text) for answer_sentence in ans_doc.sentences]
@@ -27,25 +28,31 @@ def extract_answer(question, ans_doc):
 		ans_score = 0
 		for i, sentence in enumerate(ans_doc.sentences):
 			# check sentences highly related with question or short enough
-			if similarities[i] >= 0.4 or len(sentence.words) <= 6:
+			if similarities[i] >= 0.6 or len(sentence.words) <= 6:
 				print("match sentence:", sentence.text)
 				sentence_score = 0
 				for word in sentence.words:
 					# print(i, word.text, word.lemma)
+					word_score = 0
 					if word.lemma in positive_words:
-						sentence_score += 1
+						word_score = 1
 					elif word.lemma in negative_words:
-						sentence_score -= 1
-				if sentence_score > 0:
-					ans_score += 1
-				elif sentence < 0:
-					ans_score -= 1
+						word_score = -1
 
-		final_ans = "NOT GIVEN/NO IDEA"
+					if sentence_score == 0 and word_score != 0:
+						sentence_score += word_score
+					else:
+						sentence_score *= word_score
+				if sentence_score > 0:
+					ans_score += similarities[i]
+				elif sentence_score < 0:
+					ans_score -= similarities[i]
+
+		final_ans = "not given"
 		if ans_score > 0:
-			final_ans = "YES"
+			final_ans = "yes"
 		elif ans_score < 0:
-			final_ans = "NO"
+			final_ans = "no"
 
 		return final_ans
 
@@ -57,8 +64,6 @@ positive_words = ["yes", "certain", "sure", "indeed", "affirm", "agree", "positi
                   "surely"]
 negative_words = ["no", "not", "never", "none", "neither", "nor", "without", "deny", "refuse", "reject", "incorrect",
                   "wrong"]
-
-
 
 # print("question:")
 # recognite(ans_doc)
@@ -74,8 +79,14 @@ if __name__ == "__main__":
 		"into being in 1861, it had several names including Italian Kingdom, Roman Empire and the Republic of "
 		"Italy among others. If we start the chronicle back in time, then Rome was the first name to which Romans "
 		"were giving credit. Later this city became known as “Caput Mundi” or the capital of the world...")
-
-	ans_doc = nlp(a)
+	a_doc = nlp(a)
 	q_doc = nlp(q)
+	# print(extract_answer(q, a_doc))
 
-	print(extract_answer(q, ans_doc))
+	q = "Managua is not the capital of Nicaragua. Yes or no?"
+	a = ("Most people think Managua is the capital of Nicaragua. However, Managua is not the capital of Nicaragua. The "
+	     "capital of Nicaragua is Managua. The capital of Nicaragua is Managua. Managua is the capital of Nicaragua. "
+	     "The capital")
+	a_doc = nlp(a)
+	q_doc = nlp(q)
+	print(extract_answer(q, a_doc))
