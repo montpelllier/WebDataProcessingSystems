@@ -17,14 +17,15 @@ def classify_question(text):
 	return question_type
 
 
-q_type = classify_question(text1)
-if q_type == 0:
-	print("open question")
-elif q_type == 1:
-	print("boolean question")
+if __name__ == "__main__":
+	q_type = classify_question(text1)
+	if q_type == 0:
+		print("open question")
+	elif q_type == 1:
+		print("boolean question")
 
-q_type = classify_question(text2)
-if q_type == 0:
-	print("open question")
-elif q_type == 1:
-	print("boolean question")
+	q_type = classify_question(text2)
+	if q_type == 0:
+		print("open question")
+	elif q_type == 1:
+		print("boolean question")
