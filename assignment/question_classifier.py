@@ -36,7 +36,8 @@ if __name__ == "__main__":
 	q14 = "The capital of Italy is?"
 	q15 = "Managua is not the capital of Nicaragua. Yes or no?"
 	q16 = "the capital of nicaragua is..."
-	questions = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16]
+	q17 = "sky isn't blue, right?"
+	questions = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17]
 
 	for q in questions:
 		q_type = classify_question(q)
