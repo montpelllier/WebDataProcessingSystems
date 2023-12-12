@@ -2,3 +2,5 @@ requests~=2.31.0
 stanza~=1.7.0
 transformers~=4.32.1
 tensorflow~=2.15.0
+numpy~=1.26.2
+beautifulsoup4~=4.12.2
