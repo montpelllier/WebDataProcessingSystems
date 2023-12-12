@@ -17,9 +17,18 @@ def extract_answer(question, ans_doc):
 	if classify_question(question) == 0:
 		# open question. select from entity candidates
 		print("open question")
-		for sentence in ans_doc.sentences:
-			for entity in sentence.ents:
-				print(f"entity: {entity.text}, type: {entity.type}")
+	# ent_type = classify_open_question(question)
+	# if ent_type == 0:
+	# 	pass
+	# elif ent_type == 1:
+	# 	pass
+	# elif ent_type == 2:
+	# 	pass
+	# elif ent_type == 3:
+	# 	pass
+	# for sentence in ans_doc.sentences:
+	# 	for entity in sentence.ents:
+	# 		print(f"entity: {entity.text}, type: {entity.type}")
 
 	# check type, similarity...
 	else:
@@ -49,12 +58,11 @@ def extract_answer(question, ans_doc):
 						elif word_score != 0:
 							sentence_score *= word_score
 				ans_score += sentence_score * similarities[i]
-				print(ans_score)
-				# if sentence_score > 0:  # positive
-				# 	ans_score += similarities[i]
-				# elif sentence_score < 0:  # negative
-				# 	ans_score -= similarities[i]
-
+			# if sentence_score > 0:  # positive
+			# 	ans_score += similarities[i]
+			# elif sentence_score < 0:  # negative
+			# 	ans_score -= similarities[i]
+		print(ans_score)
 		final_ans = "not given"
 		if ans_score > 0:
 			final_ans = "yes"
@@ -109,6 +117,22 @@ if __name__ == "__main__":
 	     "on the time of day and atmospheric conditions. For example, during sunrise and sunset, the sky can take on "
 	     "hues of red, orange, and pink, due to the scattering of light by atmospheric particles. However, "
 	     "the blue color of the sky remains a constant feature of the Earth's atmosphere under normal conditions.")
+	a_doc = nlp(a)
+	q_doc = nlp(q)
+	print(extract_answer(q, a_doc))
+
+	q = "the capital of nicaragua is..."
+	a = ("Prior to 1979, Nicaragua was known as the Republic of Nicaragua. It is a republic with a presidential system "
+	     "of government. The capital of Nicaragua is Managua. The capital of Nicaragua is Managua. What is the capital "
+	     "of nicar")
+	a_doc = nlp(a)
+	q_doc = nlp(q)
+	print(extract_answer(q, a_doc))
+
+	q = "who is the first present of the Netherlands?"
+	a = ("The first president of the Netherlands was Queen Wilhelmina, who served from 1890 to 1943. She was the first "
+	     "monarch to be appointed as president of the Netherlands, and she played a significant role in the country's "
+	     "history, particularly during World War II.")
 	a_doc = nlp(a)
 	q_doc = nlp(q)
 	print(extract_answer(q, a_doc))

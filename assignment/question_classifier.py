@@ -85,13 +85,13 @@ if __name__ == "__main__":
 	q17 = "sky isn't blue, right?"
 	questions = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17]
 
-	# for q in questions:
-	# 	q_type = classify_question(q)
-	# 	print(q)
-	# 	if q_type == 0:
-	# 		print("open question")
-	# 	elif q_type == 1:
-	# 		print("boolean question")
-
 	for q in questions:
-		classify_open_question(q)
+		q_type = classify_question(q)
+		print(q)
+		if q_type == 0:
+			print("open question")
+		elif q_type == 1:
+			print("boolean question")
+
+	# for q in questions:
+	# 	classify_open_question(q)

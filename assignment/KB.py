@@ -40,7 +40,7 @@ def wikidata_query(entity_name):
 			item_id = result.get('item', {}).get('value', '')
 			item_label = result.get('itemLabel', {}).get('value', '')
 			print(f"Item ID: {item_id}, Label: {item_label}")
-		print(results)
+	# print(results)
 	else:
 		print(f"Error {response.status_code}: {response.text}")
 
