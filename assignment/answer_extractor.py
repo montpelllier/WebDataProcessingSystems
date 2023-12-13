@@ -181,10 +181,10 @@ if __name__ == "__main__":
 
     q = "Is Rome the capital of Italy?"
     a = (
-    	"surely it is. but many don’t know this fact that Italy was not always called as Italy. Before Italy came "
-    	"into being in 1861, it had several names including Italian Kingdom, Roman Empire and the Republic of "
-    	"Italy among others. If we start the chronicle back in time, then Rome was the first name to which Romans "
-    	"were giving credit. Later this city became known as “Caput Mundi” or the capital of the world...")
+        "surely it is. but many don’t know this fact that Italy was not always called as Italy. Before Italy came "
+        "into being in 1861, it had several names including Italian Kingdom, Roman Empire and the Republic of "
+        "Italy among others. If we start the chronicle back in time, then Rome was the first name to which Romans "
+        "were giving credit. Later this city became known as “Caput Mundi” or the capital of the world...")
     a_doc = nlp(a)
     q_doc = nlp(q)
     print(extract_answer(q_doc, a_doc))
