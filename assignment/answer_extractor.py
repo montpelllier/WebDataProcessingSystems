@@ -1,4 +1,5 @@
-import numpy as np
+import string
+
 import stanza
 
 from assignment.question_classifier import *
@@ -51,42 +52,78 @@ def extract_boolean_answer(question, ans_doc):
     return final_ans
 
 
+def cal_distance(text, keywords, word):
+    replace_candidate = ["@&*씨sバ9!$", "x遪q39발c3", "..3n3敵jnカ\\#*2_"]
+    replacement = None
+    for candidate in replace_candidate:
+        if candidate not in text:
+            replacement = candidate
+            break
+
+    translator = str.maketrans("", "", string.punctuation)
+    text = text.translate(translator)  # remove punctuation
+    text = text.replace(word, replacement).split(" ")
+
+    keywords_idx = []
+    word_idx = text.index(replacement)
+    for keyword in keywords:
+        idx = text.index(keyword) if keyword in text else -1
+        keywords_idx.append(idx)
+
+    distance = 0
+    for idx in keywords_idx:
+        if idx == 0:
+            distance += 2
+        else:
+            distance += abs(word_idx - idx) / len(text)
+    return distance / len(keywords)
+
+
 def extract_entity_answer(ques_doc, ans_doc):
-    # ent_type = classify_open_question(question)
-    # if ent_type == 0:
-    # 	pass
-    # elif ent_type == 1:
-    # 	pass
-    # elif ent_type == 2:
-    # 	pass
-    # elif ent_type == 3:
-    # 	pass
-    # ent_type = "PERSON"
-    q_ents = []
+    # use word type, similarity to question, distance to keywords
+    name_type = ["GPE", "PERSON"]
+    ent_type = "GPE"
+    if ent_type in name_type:
+        type_score = 1.5  # adjust type score weight if it's a name
+    else:
+        type_score = 2
+
+    keywords = []  # set entities in question to keywords
     for sentence in ques_doc.sentences:
         for entity in sentence.ents:
             print(f"entity: {entity.text}, type: {entity.type}")
-            # if entity.type == ent_type:
-            q_ents.append(entity.text)
+            keywords.append(str.lower(entity.text))
     print("_________")
+
     candidates = []
     for sentence in ans_doc.sentences:
         for entity in sentence.ents:
             print(f"entity: {entity.text}, type: {entity.type}")
-            # if entity.type == ent_type:
-            candidates.append(entity.text)
+            entity_text = str.lower(entity.text)
+            if entity_text not in keywords:  # assume answer entity won't appear in the question entities.
+                type_score = type_score if entity.type == ent_type else 0
+                distance_score = 2 - cal_distance(sentence.text, keywords, entity.text)
+                # print(type_score, distance_score)
+                candidates.append((entity.text, type_score + distance_score))
 
     if not candidates:
         return
-    pairs = [(ques_doc.text, candidate) for candidate in candidates]
+    pairs = [(ques_doc.text, candidate[0]) for candidate in candidates]
     similarities = cal_sentence_similarity(pairs)
-    print(similarities)
-    idx = np.argmax(similarities)
-    print(candidates[idx])
+    # add similarity
+    candidate = [(tup[0], tup[1] + val) for tup, val in zip(candidates, similarities)]
+    print(candidate)
+
+    entity = max(candidates, key=lambda x: x[1])
+    return entity[0]
 
 
 def extract_answer(ques_doc, ans_doc):
     question = ques_doc.text
+    for sent in ques_doc.sentences:
+        for word in sent.words:
+            print(f'word: {word.text}\tupos: {word.upos}\txpos: {word.xpos}\tfeats: {word.feats if word.feats else "_"}')
+
     print(question)
     if classify_question(question) == 0:
         # open question. select from entity candidates
@@ -157,10 +194,15 @@ if __name__ == "__main__":
     q_doc = nlp(q)
     print(extract_answer(q_doc, a_doc))
 
-    q = "who was the first present of the Netherlands?"
+    q = "who was the first president of the Netherlands?"
     a = ("The first president of the Netherlands was Queen Wilhelmina, who served from 1890 to 1943. She was the first "
          "monarch to be appointed as president of the Netherlands, and she played a significant role in the country's "
          "history, particularly during World War II.")
     a_doc = nlp(a)
     q_doc = nlp(q)
     print(extract_answer(q_doc, a_doc))
+    # sentence = "The first president of the Netherlands was Queen Wilhelmina, who served from 1890 to 1943."
+    # keywords = ["first", "president", "Netherlands"]
+    # word = "Queen Wilhelmina"
+    # dist = cal_distance(sentence, keywords, word)
+    # print(2 - dist)
