@@ -1,3 +1,4 @@
+import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 
@@ -13,49 +14,37 @@ def classify_question(text):
     return question_type
 
 
-def classify_open_question(text):
-    """
-    The classes in TREC-6 are
-    ABBR - Abbreviation
-    DESC - Description and abstract concepts
-    ENTY - Entities
-    HUM - Human beings
-    LOC - Locations
-    NYM - Numeric values
-    """
-    # MODEL_NAME = 'distilbert-base-uncased'
-    # tokenizer = DistilBertTokenizer.from_pretrained(MODEL_NAME)
-    # model = TFDistilBertForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=6)
-    #
-    # optimizer = tf.keras.optimizers.Adam(learning_rate=2e-5)
-    # loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-    # metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
-    # model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
-    #
-    # # 分词句子
-    # inputs = tokenizer.encode_plus(
-    # 	text,
-    # 	add_special_tokens=True,  # 添加特殊令牌
-    # 	max_length=64,  # 最大序列长度
-    # 	padding='max_length',  # 填充
-    # 	truncation=True,  # 截断
-    # 	return_tensors='tf'  # 返回TensorFlow张量
-    # )
-    # # 获取input_ids和attention_mask
-    # input_ids = inputs['input_ids']
-    # attention_mask = inputs['attention_mask']
-    #
-    # # 进行预测
-    # predictions = model.predict([input_ids, attention_mask])
-    #
-    # # 获取预测的类别（最大概率）
-    # predicted_class = tf.math.argmax(predictions.logits, axis=-1)
-    #
-    # # 输出预测的类别
-    # print(text)
-    # print(f'Predicted class: {predicted_class.numpy()[0]}')
+def classify_entity_question(question):
+    # PERSON (29, 30, 31)
+    # NORP (Nationalities/religious/political groups) NORP （国籍/宗教/政治团体）(16)
+    # ORG (Organization) ORG （组织）(28)
+    # GPE (Countries/cities/states) GPE （国家/城市/州）(32,33,36)
+    # LOC (Location) LOC （位置）(34, 35)
+    # FAC, PRODUCT, WORK_OF_ART, LAW(2,3,5,9,10,14,15,22)
+    # EVENT (8)
+    # LANGUAGE (11)
+    # DATE (39)
+    # PERCENT(45)
+    # MONEY(41)
+    # QUANTITY(48, 49, 40)
+    # ORDINAL(42)
+    # CARDINAL (others), TIME ()
+    MODEL_NAME = 'bert-base-cased'
+    MODEL_PATH = '../model/transformers' + "/" + MODEL_NAME
 
-    return 0
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
+    # 加载tokenizer
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")  # 或者您使用的其他模型
+
+    # 准备输入数据
+    # question = "When is Chrismas day"  # modify here
+    inputs = tokenizer(question, padding="max_length", truncation=True, max_length=128, return_tensors="pt")
+    # 生成预测
+    with torch.no_grad():
+        outputs = model(**inputs)
+        predictions = torch.argmax(outputs.logits, dim=-1)
+
+    return predictions.item()
 
 
 if __name__ == "__main__":
@@ -81,13 +70,24 @@ if __name__ == "__main__":
     q15 = "Managua is not the capital of Nicaragua. Yes or no?"
     q16 = "the capital of nicaragua is..."
     q17 = "sky isn't blue, right?"
-    questions = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17]
+    q18 = "who is the inventor of smart phone?"
+    q19 = "where is Van Gogh from?"
+    q20 = "what is most expensive painting"
+    q21 = "which language used by most people?"
+    q22 = "what lead to the World War I?"
+    q23 = "what is GDP of Netherlands in 2022?"
+    q24 = "Mozart's nationality?"
+
+    questions = [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22,
+                 q23, q24]
 
     for q in questions:
         q_type = classify_question(q)
         print(q)
         if q_type == 0:
             print("open question")
+            label = classify_entity_question(q)
+            print(label)
         elif q_type == 1:
             print("boolean question")
 

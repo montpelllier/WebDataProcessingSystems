@@ -6,6 +6,9 @@ import stanza
 from assignment.question_classifier import *
 from assignment.sentence_similarity_calculator import *
 
+type_list = ["PERSON", "NORP", "ORG", "GPE", "LOC", ["FAC", "PRODUCT", "WORK_OF_ART", "LAW"], "EVENT", "LANGUAGE",
+             "DATE", "PERCENT", "MONEY", "QUANTITY", "ORDINAL", ["CARDINAL", "TIME"]]
+
 positive_words = ["yes", "certain", "sure", "indeed", "affirm", "agree", "positive", "correct", "right", "definite",
                   "surely", "certainly", "definitely"]
 negative_words = ["no", "not", "never", "none", "neither", "nor", "without", "deny", "refuse", "reject", "incorrect",
@@ -77,7 +80,13 @@ def cal_distance_score(text, keywords, word):
     return score
 
 
-def get_ans_entity_candidates(ans_doc, ent_type, keywords, score):
+def get_type_score(entity_type, question_type):
+    if isinstance(question_type, list):
+        return 3 if entity_type in question_type else 0
+    return 3 if entity_type == question_type else 0
+
+
+def get_ans_entity_candidates(ans_doc, q_ent_type, keywords):
     candidates = []
     keywords = {keyword.lower() for keyword in keywords}
     for sentence in ans_doc.sentences:
@@ -86,7 +95,7 @@ def get_ans_entity_candidates(ans_doc, ent_type, keywords, score):
             entity_text = str.lower(entity.text)
             # assume answer entity won't appear in the question.
             if entity_text not in keywords:
-                type_score = score if entity.type == ent_type else 0
+                type_score = get_type_score(entity.type, q_ent_type)
                 distance_score = cal_distance_score(sentence.text, keywords, entity.text)
                 # print(type_score, distance_score)
                 candidates.append((entity.text, type_score + distance_score))
@@ -132,20 +141,19 @@ def extract_boolean_answer(question, ans_doc):
     return final_ans
 
 
-def extract_entity_answer(ques_doc, ans_doc):
+def get_ent_type(question):
+    ent_type = classify_entity_question(question)
+    return type_list[ent_type]
+
+
+def extract_entity_answer(ques_doc, ans_doc, ent_type):
     # use word type, similarity to question, distance to keywords
-    name_type = ["GPE", "PERSON"]
-    ent_type = "GPE"
-    if ent_type in name_type:
-        type_score = 2  # adjust type score weight if it's a name
-    else:
-        type_score = 3
 
     # get keywords from question
     keywords = extract_keywords(ques_doc)
     # print("keywords:", keywords)
     # select candidate entities with type score and distance score.
-    candidates = get_ans_entity_candidates(ans_doc, ent_type, keywords, type_score)
+    candidates = get_ans_entity_candidates(ans_doc, ent_type, keywords)
     if not candidates:
         return None
 
@@ -166,7 +174,7 @@ def extract_answer(ques_doc, ans_doc):
     if classify_question(question) == 0:
         # open question. select from entity candidates
         print("type: entity question")
-        return extract_entity_answer(ques_doc, ans_doc)
+        return extract_entity_answer(ques_doc, ans_doc, get_ent_type(question))
     else:
         # boolean question. use keyword
         print("type: boolean question")
@@ -175,27 +183,30 @@ def extract_answer(ques_doc, ans_doc):
 
 if __name__ == "__main__":
     # test
-    # stanza.download('en')  # download English model
+    stanza.download('en')  # download English model
     # initialize English neural pipeline
     nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
 
+
+    def test(ques, ans):
+        a_doc = nlp(ans)
+        q_doc = nlp(ques)
+        print(f"extracted: {extract_answer(q_doc, a_doc)}\n")
+
+
     q = "Is Rome the capital of Italy?"
     a = (
-        "surely it is. but many don’t know this fact that Italy was not always called as Italy. Before Italy came "
+        "surely it is but many don’t know this fact that Italy was not always called as Italy. Before Italy came "
         "into being in 1861, it had several names including Italian Kingdom, Roman Empire and the Republic of "
         "Italy among others. If we start the chronicle back in time, then Rome was the first name to which Romans "
         "were giving credit. Later this city became known as “Caput Mundi” or the capital of the world...")
-    a_doc = nlp(a)
-    q_doc = nlp(q)
-    print(extract_answer(q_doc, a_doc))
+    test(q, a)
 
     q = "Managua is not the capital of Nicaragua. Yes or no?"
     a = ("Most people think Managua is the capital of Nicaragua. However, Managua is not the capital of Nicaragua. The "
          "capital of Nicaragua is Managua. The capital of Nicaragua is Managua. Managua is the capital of Nicaragua. "
          "The capital")
-    a_doc = nlp(a)
-    q_doc = nlp(q)
-    print(extract_answer(q_doc, a_doc))
+    test(q, a)
 
     q = "sky isn't blue, right?"
     a = ("The statement \"the sky isn't blue\" is not accurate. The Earth's atmosphere, particularly the gases and "
@@ -208,22 +219,16 @@ if __name__ == "__main__":
          "on the time of day and atmospheric conditions. For example, during sunrise and sunset, the sky can take on "
          "hues of red, orange, and pink, due to the scattering of light by atmospheric particles. However, "
          "the blue color of the sky remains a constant feature of the Earth's atmosphere under normal conditions.")
-    a_doc = nlp(a)
-    q_doc = nlp(q)
-    print(extract_answer(q_doc, a_doc))
+    test(q, a)
 
     q = "the capital of nicaragua is..."
     a = ("Prior to 1979, Nicaragua was known as the Republic of Nicaragua. It is a republic with a presidential system "
          "of government. The capital of Nicaragua is Managua. The capital of Nicaragua is Managua. What is the capital "
          "of nicar")
-    a_doc = nlp(a)
-    q_doc = nlp(q)
-    print(extract_answer(q_doc, a_doc))
+    test(q, a)
 
     q = "who was the first president of the Netherlands?"
     a = ("The first president of the Netherlands was Queen Wilhelmina, who served from 1890 to 1943. She was the first "
          "monarch to be appointed as president of the Netherlands, and she played a significant role in the country's "
          "history, particularly during World War II.")
-    a_doc = nlp(a)
-    q_doc = nlp(q)
-    print(extract_answer(q_doc, a_doc))
+    test(q, a)
