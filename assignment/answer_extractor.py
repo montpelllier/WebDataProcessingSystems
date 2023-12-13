@@ -169,7 +169,6 @@ def extract_entity_answer(ques_doc, ans_doc, ent_type):
 
 def extract_answer(ques_doc, ans_doc):
     question = ques_doc.text
-    print("question:", question)
 
     if classify_question(question) == 0:
         # open question. select from entity candidates
@@ -189,6 +188,8 @@ if __name__ == "__main__":
 
 
     def test(ques, ans):
+        print("question:", ques)
+        print("answer:", ans)
         a_doc = nlp(ans)
         q_doc = nlp(ques)
         print(f"extracted: {extract_answer(q_doc, a_doc)}\n")
