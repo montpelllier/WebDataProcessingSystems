@@ -11,8 +11,8 @@ def cal_sentence_similarity(pair_list):
         return pair_list
 
     scores = model.predict(pair_list, show_progress_bar=False)
-    for i in range(len(pair_list)):
-        print("{} \t\t {} \t\t Score: {:.4f}".format(pair_list[i][0], pair_list[i][1], scores[i]))
+    # for i in range(len(pair_list)):
+    #     print("{} \t\t {} \t\t Score: {:.4f}".format(pair_list[i][0], pair_list[i][1], scores[i]))
 
     return scores
 

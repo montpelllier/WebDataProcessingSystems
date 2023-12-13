@@ -45,44 +45,6 @@ def extract_keywords(doc):
     return merged_set
 
 
-def extract_boolean_answer(question, ans_doc):
-    pairs = [(question, answer_sentence.text) for answer_sentence in ans_doc.sentences]
-    similarities = cal_sentence_similarity(pairs)
-    ans_score = 0
-
-    for i, sentence in enumerate(ans_doc.sentences):
-        # check sentences highly related with question or short enough
-        if similarities[i] >= 0.75 or len(sentence.words) <= 6:
-            print("match sentence:", sentence.text, sentence.sentiment)
-            sentence_score = sentence.sentiment - 1  # 0,1,2 negative, neutral, positive
-
-            if sentence_score == 0:
-                for word in sentence.words:
-                    word_score = 0
-                    if word.lemma in positive_words:
-                        word_score = 1
-                    elif word.lemma in negative_words:
-                        word_score = -1
-
-                    if sentence_score == 0 and word_score != 0:
-                        sentence_score += word_score
-                    elif word_score != 0:
-                        sentence_score *= word_score
-            ans_score += sentence_score * similarities[i]
-    # if sentence_score > 0:  # positive
-    # 	ans_score += similarities[i]
-    # elif sentence_score < 0:  # negative
-    # 	ans_score -= similarities[i]
-    print(ans_score)
-    final_ans = "not given"
-    if ans_score > 0:
-        final_ans = "yes"
-    elif ans_score < 0:
-        final_ans = "no"
-
-    return final_ans
-
-
 def cal_distance_score(text, keywords, word):
     text = str.lower(text)
     keywords = [word.lower() for word in keywords]
@@ -115,6 +77,61 @@ def cal_distance_score(text, keywords, word):
     return score
 
 
+def get_ans_entity_candidates(ans_doc, ent_type, keywords, score):
+    candidates = []
+    keywords = {keyword.lower() for keyword in keywords}
+    for sentence in ans_doc.sentences:
+        for entity in sentence.ents:
+            # print(f"entity: {entity.text}, type: {entity.type}")
+            entity_text = str.lower(entity.text)
+            # assume answer entity won't appear in the question.
+            if entity_text not in keywords:
+                type_score = score if entity.type == ent_type else 0
+                distance_score = cal_distance_score(sentence.text, keywords, entity.text)
+                # print(type_score, distance_score)
+                candidates.append((entity.text, type_score + distance_score))
+
+    return candidates
+
+
+def extract_boolean_answer(question, ans_doc):
+    pairs = [(question, answer_sentence.text) for answer_sentence in ans_doc.sentences]
+    similarities = cal_sentence_similarity(pairs)
+    ans_score = 0
+
+    for i, sentence in enumerate(ans_doc.sentences):
+        # check sentences highly related with question or short enough
+        if similarities[i] >= 0.75 or len(sentence.words) <= 6:
+            # print("match sentence:", sentence.text, sentence.sentiment)
+            sentence_score = sentence.sentiment - 1  # 0,1,2 negative, neutral, positive
+
+            if sentence_score == 0:
+                for word in sentence.words:
+                    word_score = 0
+                    if word.lemma in positive_words:
+                        word_score = 1
+                    elif word.lemma in negative_words:
+                        word_score = -1
+
+                    if sentence_score == 0 and word_score != 0:
+                        sentence_score += word_score
+                    elif word_score != 0:
+                        sentence_score *= word_score
+            ans_score += sentence_score * similarities[i]
+    # if sentence_score > 0:  # positive
+    # 	ans_score += similarities[i]
+    # elif sentence_score < 0:  # negative
+    # 	ans_score -= similarities[i]
+    # print(ans_score)
+    final_ans = "not given"
+    if ans_score > 0:
+        final_ans = "yes"
+    elif ans_score < 0:
+        final_ans = "no"
+
+    return final_ans
+
+
 def extract_entity_answer(ques_doc, ans_doc):
     # use word type, similarity to question, distance to keywords
     name_type = ["GPE", "PERSON"]
@@ -136,27 +153,10 @@ def extract_entity_answer(ques_doc, ans_doc):
     similarities = cal_sentence_similarity(pairs)
     # add similarity
     candidate = [(tup[0], tup[1] + val) for tup, val in zip(candidates, similarities)]
-    print(candidate)
+    # print(candidate)
 
     entity = max(candidates, key=lambda x: x[1])
     return entity[0]
-
-
-def get_ans_entity_candidates(ans_doc, ent_type, keywords, score):
-    candidates = []
-    keywords = {keyword.lower() for keyword in keywords}
-    for sentence in ans_doc.sentences:
-        for entity in sentence.ents:
-            # print(f"entity: {entity.text}, type: {entity.type}")
-            entity_text = str.lower(entity.text)
-            # assume answer entity won't appear in the question.
-            if entity_text not in keywords:
-                type_score = score if entity.type == ent_type else 0
-                distance_score = cal_distance_score(sentence.text, keywords, entity.text)
-                # print(type_score, distance_score)
-                candidates.append((entity.text, type_score + distance_score))
-
-    return candidates
 
 
 def extract_answer(ques_doc, ans_doc):
@@ -165,52 +165,53 @@ def extract_answer(ques_doc, ans_doc):
 
     if classify_question(question) == 0:
         # open question. select from entity candidates
-        print("open question")
+        print("type: entity question")
         return extract_entity_answer(ques_doc, ans_doc)
     else:
         # boolean question. use keyword
-        print("boolean question")
+        print("type: boolean question")
         return extract_boolean_answer(question, ans_doc)
 
 
 if __name__ == "__main__":
     # test
-    # q = "Is Rome the capital of Italy?"
-    # a = (
-    # 	"surely it is. but many don’t know this fact that Italy was not always called as Italy. Before Italy came "
-    # 	"into being in 1861, it had several names including Italian Kingdom, Roman Empire and the Republic of "
-    # 	"Italy among others. If we start the chronicle back in time, then Rome was the first name to which Romans "
-    # 	"were giving credit. Later this city became known as “Caput Mundi” or the capital of the world...")
-    # a_doc = nlp(a)
-    # q_doc = nlp(q)
-    # print(extract_answer(q, a_doc))
-    #
-    # q = "Managua is not the capital of Nicaragua. Yes or no?"
-    # a = ("Most people think Managua is the capital of Nicaragua. However, Managua is not the capital of Nicaragua. The "
-    #      "capital of Nicaragua is Managua. The capital of Nicaragua is Managua. Managua is the capital of Nicaragua. "
-    #      "The capital")
-    # a_doc = nlp(a)
-    # q_doc = nlp(q)
-    # print(extract_answer(q, a_doc))
-    #
-    # q = "sky isn't blue, right?"
-    # a = ("The statement \"the sky isn't blue\" is not accurate. The Earth's atmosphere, particularly the gases and "
-    #      "particles in the air, scatters sunlight, making the sky appear blue. This phenomenon is known as Rayleigh "
-    #      "scattering, named after Lord Rayleigh, who first described it in the late 19th century. The blue color we "
-    #      "see in the sky is a result of the scattering of sunlight by the tiny molecules of gases in the atmosphere, "
-    #      "such as nitrogen and oxygen. The shorter, blue wavelengths are scattered in all directions, while the "
-    #      "longer, red wavelengths pass straight through the atmosphere with little scattering, which is why the sky "
-    #      "typically appears blue during the daytime. It's worth noting that the color of the sky can change depending "
-    #      "on the time of day and atmospheric conditions. For example, during sunrise and sunset, the sky can take on "
-    #      "hues of red, orange, and pink, due to the scattering of light by atmospheric particles. However, "
-    #      "the blue color of the sky remains a constant feature of the Earth's atmosphere under normal conditions.")
-    # a_doc = nlp(a)
-    # q_doc = nlp(q)
-    # print(extract_answer(q, a_doc))
-
     # stanza.download('en')  # download English model
     # initialize English neural pipeline
     nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
+
+    q = "Is Rome the capital of Italy?"
+    a = (
+    	"surely it is. but many don’t know this fact that Italy was not always called as Italy. Before Italy came "
+    	"into being in 1861, it had several names including Italian Kingdom, Roman Empire and the Republic of "
+    	"Italy among others. If we start the chronicle back in time, then Rome was the first name to which Romans "
+    	"were giving credit. Later this city became known as “Caput Mundi” or the capital of the world...")
+    a_doc = nlp(a)
+    q_doc = nlp(q)
+    print(extract_answer(q_doc, a_doc))
+
+    q = "Managua is not the capital of Nicaragua. Yes or no?"
+    a = ("Most people think Managua is the capital of Nicaragua. However, Managua is not the capital of Nicaragua. The "
+         "capital of Nicaragua is Managua. The capital of Nicaragua is Managua. Managua is the capital of Nicaragua. "
+         "The capital")
+    a_doc = nlp(a)
+    q_doc = nlp(q)
+    print(extract_answer(q_doc, a_doc))
+
+    q = "sky isn't blue, right?"
+    a = ("The statement \"the sky isn't blue\" is not accurate. The Earth's atmosphere, particularly the gases and "
+         "particles in the air, scatters sunlight, making the sky appear blue. This phenomenon is known as Rayleigh "
+         "scattering, named after Lord Rayleigh, who first described it in the late 19th century. The blue color we "
+         "see in the sky is a result of the scattering of sunlight by the tiny molecules of gases in the atmosphere, "
+         "such as nitrogen and oxygen. The shorter, blue wavelengths are scattered in all directions, while the "
+         "longer, red wavelengths pass straight through the atmosphere with little scattering, which is why the sky "
+         "typically appears blue during the daytime. It's worth noting that the color of the sky can change depending "
+         "on the time of day and atmospheric conditions. For example, during sunrise and sunset, the sky can take on "
+         "hues of red, orange, and pink, due to the scattering of light by atmospheric particles. However, "
+         "the blue color of the sky remains a constant feature of the Earth's atmosphere under normal conditions.")
+    a_doc = nlp(a)
+    q_doc = nlp(q)
+    print(extract_answer(q_doc, a_doc))
+
     q = "the capital of nicaragua is..."
     a = ("Prior to 1979, Nicaragua was known as the Republic of Nicaragua. It is a republic with a presidential system "
          "of government. The capital of Nicaragua is Managua. The capital of Nicaragua is Managua. What is the capital "
@@ -226,8 +227,3 @@ if __name__ == "__main__":
     a_doc = nlp(a)
     q_doc = nlp(q)
     print(extract_answer(q_doc, a_doc))
-    # sentence = "The first president of the Netherlands was Queen Wilhelmina, who served from 1890 to 1943."
-    # keywords = ["first", "president", "Netherlands"]
-    # word = "Queen Wilhelmina"
-    # dist = cal_distance(sentence, keywords, word)
-    # print(2 - dist)
