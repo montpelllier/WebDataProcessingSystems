@@ -1,13 +1,15 @@
+import time
+
 import requests
 
-wikidata_values = {"PERSON": ["Q215627"], "NORP": ["Q231002", "Q111252415", "Q7278"], "ORG": ["Q43229"], "GPE": [],
+wikidata_values = {"PERSON": ["Q215627"], "NORP": ["Q231002", "Q111252415"], "ORG": ["Q43229"], "GPE": [],
                    "LOC": [], "FAC": [], "PRODUCT": [],
                    "WORK_OF_ART": [], "LAW": [], "EVENT": [], "LANGUAGE": [], "DATE": [], "PERCENT": [], "MONEY": [],
                    "QUANTITY": [], "ORDINAL": [], "CARDINAL": [], "TIME": []}
 
 
 def generate_conditions(entity_type: str):
-    if entity_type not in wikidata_values.keys():
+    if not entity_type or entity_type not in wikidata_values.keys():
         return ""
 
     values = wikidata_values.get(entity_type)
@@ -21,61 +23,51 @@ def generate_conditions(entity_type: str):
 
 
 def generate_sparql(entity_name, entity_type):
-    url = "https://query.wikidata.org/sparql"
     cond = generate_conditions(entity_type)
     service = "SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". }"
     query_sentence = f"SELECT DISTINCT ?item WHERE {{ {cond} ?item rdfs:label \"{entity_name}\"@en. {service} }}"
     return query_sentence
 
 
-def wikidata_query(entity_name, entity_type):
-    endpoint_url = "https://query.wikidata.org/sparql"
-
-    # 构建SPARQL查询语句
-    query = """
-    SELECT ?item ?itemLabel
-    WHERE {
-      ?item rdfs:label "%s"@en.
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-    }
-    """ % entity_name
-
-    # 设置HTTP请求头，包括User-Agent和Accept
+def wikidata_query(entity_name, entity_type=None):
+    url = "https://query.wikidata.org/sparql"
+    query = generate_sparql(entity_name, entity_type)
+    # set HTTP headers, including User-Agent and Accept
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/91.0.4472.124 Safari/537.36',
         'Accept': 'application/json'
     }
 
-    # 设置查询参数
     params = {
         'query': query,
         'format': 'json'
     }
-
-    # 发送HTTP GET请求
-    response = requests.get(endpoint_url, headers=headers, params=params)
-
-    # 检查响应状态码
+    # send requests
+    response = requests.get(url, headers=headers, params=params)
+    entity_ids = []
+    # check status code
     if response.status_code == 200:
-        # 解析JSON数据
         data = response.json()
-
-        # 处理查询结果
         results = data.get('results', {}).get('bindings', [])
 
         for result in results:
             item_id = result.get('item', {}).get('value', '')
-            item_label = result.get('itemLabel', {}).get('value', '')
-            print(f"Item ID: {item_id}, Label: {item_label}")
-    # print(results)
+            entity_ids.append(item_id)
+            # item_label = result.get('itemLabel', {}).get('value', '')
+            # print(f"Item ID: {item_id}.")
     else:
         print(f"Error {response.status_code}: {response.text}")
 
+    return entity_ids
 
-# 调用查询函数
-# wikidata_query("Albert Einstein")
-res = generate_conditions("NORP")
-print(res)
 
-res = generate_sparql("Italian", "NORP")
-print(res)
+if __name__ == "__main__":
+    res = wikidata_query("Muslim", "NORP")
+    print(res)
+
+    time.sleep(1)
+    print("______________")
+
+    res = wikidata_query("Italy")
+    print(res)
