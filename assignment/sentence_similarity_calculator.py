@@ -19,7 +19,11 @@ if __name__ == "__main__":
              "Before Italy came into being in 1861, it had several names including Italian Kingdom, Roman Empire and "
              "the Republic of Italy among others.",
              "If we start the chronicle back in time, then Rome was the first name to which Romans were giving credit.",
-             "Later this city became known as “Caput Mundi” or the capital of the world..."]
+             "Later this city became known as “Caput Mundi” or the capital of the world...",
+             "county seat of Floyd County, Georgia, United States",
+             "capital and largest city of Italy",
+             "city in Oneida County, New York, United States"]
 
     pair_list = [(list1[0], sentence) for sentence in list2]
-    cal_sentence_similarity(pair_list)
+    res = cal_sentence_similarity(pair_list)
+    print(res)
