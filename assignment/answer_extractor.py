@@ -160,7 +160,7 @@ def extract_entity_answer(ques_doc, ans_doc, ent_type):
     pairs = [(ques_doc.text, candidate[0]) for candidate in candidates]
     similarities = cal_sentence_similarity(pairs)
     # add similarity
-    candidate = [(tup[0], tup[1] + val) for tup, val in zip(candidates, similarities)]
+    candidates = [(tup[0], tup[1] + val) for tup, val in zip(candidates, similarities)]
     # print(candidate)
 
     entity = max(candidates, key=lambda x: x[1])
@@ -169,8 +169,8 @@ def extract_entity_answer(ques_doc, ans_doc, ent_type):
 
 def extract_answer(ques_doc, ans_doc):
     question = ques_doc.text
-
-    if classify_question(question) == 0:
+    question_type = classify_question(question)
+    if question_type == 0:
         # open question. select from entity candidates
         print("type: entity question")
         return extract_entity_answer(ques_doc, ans_doc, get_ent_type(question))

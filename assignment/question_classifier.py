@@ -2,6 +2,15 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 
+def extract_question_sentence(doc):
+    if len(doc.sentences) == 1:
+        return doc.sentences[0]
+
+    for sent in doc.sentences:
+        if sent.tokens[-1].text != '.':
+            return sent
+
+
 def classify_question(text):
     # 0: open question; 1: boolean question
     tokenizer = AutoTokenizer.from_pretrained("PrimeQA/tydiqa-boolean-question-classifier")
@@ -30,7 +39,7 @@ def classify_entity_question(question):
     # ORDINAL(42)
     # CARDINAL (others), TIME ()
     MODEL_NAME = 'bert-base-cased'
-    MODEL_PATH = '../model/transformers' + "/" + MODEL_NAME
+    MODEL_PATH = './model/transformers' + "/" + MODEL_NAME
 
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
     # 加载tokenizer
