@@ -1,89 +1,128 @@
-from transformers import BartForConditionalGeneration, BartTokenizer
-from transformers import BertModel, BertTokenizer
+from transformers import BartForConditionalGeneration, BartTokenizer, AutoModelForSequenceClassification, AutoTokenizer
+from sentence_transformers import SentenceTransformer, util
 import torch
-import torch.nn.functional as F
-import wikipediaapi
-
-def get_wikipedia_content(page_titles):
-    # Use Wikipedia API to get content from multiple pages
-    # wikiapi根据关键词查询相关页面内容并进行存储
-    wiki_wiki = wikipediaapi.Wikipedia('MyProjectName (merlin@example.com)', 'en')
-    content = ""
-
-    for title in page_titles:
-        page_py = wiki_wiki.page(title)
-        content += page_py.text + "\n"
-
-    return content
-
-def generative_summarization(content, keywords, max_length=256, chunk_size=512):
-    # Concatenate keywords and content for summarization
-    # 对所有收集到的内容进行生成式总结
-    input_text = f"Summarize: {', '.join(keywords)}. Content: {content}"
-
-    # Tokenize the input
-    tokenizer = BartTokenizer.from_pretrained('facebook/bart-large-cnn', legacy=False)
-
-    # Load pre-trained BART model for summarization
-    model = BartForConditionalGeneration.from_pretrained('facebook/bart-large-cnn')
-
-    # Generate summary
-    input_ids = tokenizer.encode(input_text, return_tensors="pt", max_length=chunk_size, truncation=True)
-    summary_ids = model.generate(input_ids, max_length=max_length, num_beams=4, length_penalty=2.0, early_stopping=True)
-    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
-
-    return summary
+from nltk.tokenize import sent_tokenize
+import requests
+from bs4 import BeautifulSoup
 
 
-# Function to encode a text using BERT
+def get_wikipedia_page_content(url):
+    # 发送 GET 请求获取页面内容
+    response = requests.get(url)
+    # 检查请求是否成功
+    if response.status_code == 200:
+        # 使用 BeautifulSoup 解析 HTML
+        soup = BeautifulSoup(response.text, 'html.parser')
+        # 找到页面内容的标签，这取决于维基百科页面的结构
+        # 以下是以类名为 "mw-parser-output" 的 <div> 标签为例
+        content_div = soup.find('div', {'class': 'mw-body-content'})
+        # 找到该 div 元素下的所有 <p> 元素
+        paragraphs = content_div.find_all('p')
+        # 提取每个 <p> 元素的文本内容
+        paragraph_texts = ""
+
+        for paragraph in paragraphs:
+          paragraph_texts += paragraph.get_text() + ' '
+        return paragraph_texts
+    else:
+        print(f"failed request: {response.status_code}")
+        return None
+
+
+def extract_content_with_keywords(content, keywords):
+    '''
+    extract sentences containing keywords
+    '''
+    sentences = sent_tokenize(content)
+    selected_sentences = ""
+
+    for sentence in sentences:
+        if all(keyword in sentence for keyword in keywords):
+            selected_sentences += sentence + " "
+
+    # Remove trailing space
+    selected_sentences = selected_sentences.strip()
+    return selected_sentences
+
+
+def get_boolQ_predict(question, content):
+    '''
+    Get the answer of bool question using model roberta-large-boolq
+    '''
+    tokenizer = AutoTokenizer.from_pretrained("nfliu/roberta-large_boolq")
+    model_boolQ = AutoModelForSequenceClassification.from_pretrained("nfliu/roberta-large_boolq")
+
+    sequence = tokenizer.encode_plus(question, content, return_tensors="pt", max_length=512, truncation=True)['input_ids']
+    logits = model_boolQ(sequence)[0]
+    probabilities = torch.softmax(logits, dim=1).detach().cpu().tolist()[0]
+    proba_yes = round(probabilities[1], 2)
+    proba_no = round(probabilities[0], 2)
+
+    print(f"Question: {question}, Yes: {proba_yes}, No: {proba_no}")
+
+    if proba_yes >  proba_no:
+        return "yes"
+    else:
+        return "no"
+
 def encode_text(text):
+    sim_model = SentenceTransformer('bert-base-nli-stsb-mean-tokens')
+    encoded_text = sim_model.encode(text, convert_to_tensor=True)
+    return encoded_text
+
+def get_similarity_score(embedding1, embedding2):
+    cosine_scores = util.pytorch_cos_sim(embedding1, embedding2)
+    return cosine_scores.item()
 
 
-    # Load pre-trained model and tokenizer
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    model = BertModel.from_pretrained('bert-base-uncased')
-
-    # Tokenize and encode the text as per the model's requirements
-    inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
-    # Get the embeddings for the text
-    with torch.no_grad():
-        outputs = model(**inputs)
-    # The last_hidden_state is the embeddings for all tokens
-    # Take the mean of the token embeddings to get a single vector for the text
-    return outputs.last_hidden_state.mean(dim=1)
-
-# Function to calculate the cosine similarity between two vectors
-def cosine_similarity(vec1, vec2):
-    return F.cosine_similarity(vec1, vec2).item()
+def result_similarity_score(text1, text2):
+    embedding1 = encode_text(text1)
+    embedding2 = encode_text(text2)
+    similarity_score = get_similarity_score(embedding1, embedding2)
+    return similarity_score
 
 
+if __name__ == '__main__':
 
-QA_llama = "Roma or Romani people, commonly known as Gypsies, are an ethnic group living mostly in Europe and the Americas. Roma is the name of an ancient Egyptian High Priest of Amun and a Brazilian football player. The word Roma is also used to refer to Rome, the capital of Italy."
+    # question = "Is Beijing the capital of China?"
+    question = "Why is the sky blue?"
 
-# Example usage
-# 从Task1获得问题和答案的entity 和 他们的link
-page_titles = ["Roma", "Italy"]
-keywords = ["Italy", "capital", "Roma"]
+    # entity_question = ['sky', 'capital', 'Beijing']
+    # entity_question_link = ["https://en.wikipedia.org/wiki/China", "https://en.wikipedia.org/wiki/capital", "https://en.wikipedia.org/wiki/Beijing"]
+    
+    entity_question = ['sky', 'blue']
+    entity_question_link = ["https://en.wikipedia.org/wiki/sky", "https://en.wikipedia.org/wiki/blue"]
+    
+    keywords = entity_question
 
-# Step 1: Get content from multiple Wikipedia pages
-content = get_wikipedia_content(page_titles)
+    # entity_answer = ['Beijing', 'capital', 'China']
 
-# Step 2: Perform generative summarization with keyword attention
-wiki_summary = generative_summarization(content, keywords, max_length=256, chunk_size=512)
-
-print(f"Generative Summary:\n{wiki_summary}")
-
-# Encode the texts  summary和llama的输出
-wiki_vec = encode_text(wiki_summary)
-llama_vec = encode_text(QA_llama)
-
-# Compute the cosine similarity
-similarity = cosine_similarity(wiki_vec, llama_vec)
-
-if similarity>0.7:
-  print(f"AC!")
-else:
-  print(f"WA!")
+    # extracted_answer = "yes"
+    extracted_answer = "https://en.wikipedia.org/wiki/sky"
 
 
-print(f"The similarity score between the texts is: {similarity}")
+    all_keywords_contents = ""
+    for entity_link in entity_question_link:
+        entity_content = get_wikipedia_page_content(entity_link)
+        keywords_contents = extract_content_with_keywords(entity_content, keywords)
+        all_keywords_contents += keywords_contents
+
+    # print(all_keywords_contents)
+
+    if extracted_answer == "yes" or extracted_answer == "no":
+        yesno_boolQ = get_boolQ_predict(question, all_keywords_contents)
+        if yesno_boolQ == extracted_answer:
+            print("Correct")
+        else:
+            print("Incorrect")
+
+    else:
+        extracted_content = get_wikipedia_page_content(extracted_answer)
+        extracted_keywords_contents = extract_content_with_keywords(extracted_content, keywords)
+        similarity = result_similarity_score(extracted_keywords_contents, all_keywords_contents)
+        # print(extracted_keywords_contents, all_keywords_contents, similarity)
+
+        if similarity > 0.7:
+            print("Correct")
+        else:
+            print("Incorrect")

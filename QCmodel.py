@@ -26,31 +26,33 @@
 
 # 13 TIME, CARDINAL (others)(42)
 import nltk
-from nltk.corpus import nps_chat
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
+import joblib
+from sklearn.feature_extraction.text import CountVectorizer
 
-posts = nps_chat.xml_posts()[:5000]
 
 
-def dialogue_act_features(post):
-    features = {}
-    for word in nltk.word_tokenize(post):
-        features['contains({})'.format(word.lower())] = True
-    return features
+
+# def dialogue_act_features(post):
+#     features = {}
+#     for word in nltk.word_tokenize(post):
+#         features['contains({})'.format(word.lower())] = True
+#     return features
 
 
 # identify yes/no questions
 def is_yes_no_question(question):
-    # 首先使用nltk的分类器
-    featuresets = [(dialogue_act_features(post.text), post.get('class')) for post in posts]
-    size = int(len(featuresets) * 0.1)
-    train_set, test_set = featuresets[size:], featuresets[:size]
-    classifier = nltk.NaiveBayesClassifier.train(train_set)
-    # print(nltk.classify.accuracy(classifier, test_set))
-    return classifier.classify(dialogue_act_features(question))
+    C_PATH = 'model/bqmodel/classifier.pkl'
+    V_PATH= 'model/bqmodel/vectorizer.pkl'
+    classifier = joblib.load(C_PATH)
+    vectorizer = joblib.load(V_PATH)  # 加载已经拟合过数据的 vectorizer
+    question_transformed = vectorizer.transform([question])
+    prediction = classifier.predict(question_transformed)
+    # print(prediction)
+    return prediction[0]
 
-#如果是yes/no问题，直接返回结果, 否则使用bert模型
+#identify entity questions
 def Bert(text):
     MODEL_NAME = 'bert-base-cased'
     MODEL_PATH = 'model/transformers' + "/" + MODEL_NAME
@@ -104,7 +106,7 @@ def entity_labels_transfer(label):
 
 def question_classification(text):
     result = is_yes_no_question(text)
-    if result == 'ynQuestion':
+    if result == 'boolean':
         # print(result)
         return result
     else:
@@ -149,6 +151,8 @@ for q in questions:
     # 生成预测
     result = question_classification(q)
     print(q, result)
+
+
 
 
 # train_set = []
