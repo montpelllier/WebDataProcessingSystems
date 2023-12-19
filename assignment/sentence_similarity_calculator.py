@@ -4,16 +4,12 @@ model = CrossEncoder('abbasgolestani/ag-nli-DeTS-sentence-similarity-v1')
 
 
 def cal_sentence_similarity(pair_list):
-    # pairs = zip(sentences1, sentences2)
-    # list_pairs = list(pairs)
-    # pair_list = [(sentences1, sentence) for sentence in sentences2]
     if not pair_list:
         return pair_list
 
     scores = model.predict(pair_list, show_progress_bar=False)
     # for i in range(len(pair_list)):
     #     print("{} \t\t {} \t\t Score: {:.4f}".format(pair_list[i][0], pair_list[i][1], scores[i]))
-
     return scores
 
 
