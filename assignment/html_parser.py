@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def parse(url):
+def parse_url(url):
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -18,6 +18,11 @@ def get_wikipedia_url(soup):
 
     wikipedia_url = content.get('href')
     return wikipedia_url
+
+
+def get_wikidata_brief(soup):
+    content = soup.find('div', {'class': "wikibase-entitytermsview-heading-description"})
+    return content.get_text()
 
 
 def get_wikipedia_page_content(soup):
@@ -38,8 +43,10 @@ def get_wikipedia_page_content(soup):
 # # 打印页面内容
 # for p in page_content:
 #     print(p.replace("\n", ""))
-url = "https://www.wikidata.org/wiki/Q47740"
-# url = "https://www.wikidata.org/wiki/Q2781527"
-soup = parse(url)
-if soup:
-    get_wikipedia_url(soup)
+# url = "https://www.wikidata.org/wiki/Q47740"
+# # url = "https://www.wikidata.org/wiki/Q2781527"
+# soup = parse_url(url)
+# if soup:
+#     wikipedia_url = get_wikipedia_url(soup)
+#     brief = get_wikidata_brief(soup)
+#     print(wikipedia_url, brief)
