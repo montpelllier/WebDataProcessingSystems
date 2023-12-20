@@ -2,10 +2,11 @@ import time
 
 import requests
 
-wikidata_values = {"PERSON": ["Q215627"], "NORP": ["Q231002", "Q111252415"], "ORG": ["Q43229"], "GPE": [],
-                   "LOC": [], "FAC": [], "PRODUCT": [],
-                   "WORK_OF_ART": [], "LAW": [], "EVENT": [], "LANGUAGE": [], "DATE": [], "PERCENT": [], "MONEY": [],
-                   "QUANTITY": [], "ORDINAL": [], "CARDINAL": [], "TIME": []}
+wikidata_values = {"PERSON": ["Q215627"], "NORP": ["Q231002", "Q111252415"], "ORG": ["Q43229"],
+                   "GPE": ["Q6256", "Q7275", "Q515"], "LOC": ["Q2221906"], "FAC": ["Q13226383"],
+                   "PRODUCT": ["Q2424752"], "WORK_OF_ART": ["Q838948"], "LAW": ["Q7748"], "EVENT": ["Q1656682"],
+                   "LANGUAGE": ["Q34770"], "DATE": ["Q205892"], "PERCENT": ["Q11229"], "MONEY": ["Q1368"],
+                   "QUANTITY": ["Q309314"], "ORDINAL": ["Q923933"], "CARDINAL": ["Q11563"], "TIME": ["Q11471"]}
 
 
 def generate_conditions(entity_type: str):
