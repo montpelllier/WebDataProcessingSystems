@@ -1,3 +1,5 @@
+import numpy as np
+
 from assignment.KB import *
 from assignment.html_parser import *
 from assignment.sentence_similarity_calculator import cal_sentence_similarity
@@ -19,7 +21,6 @@ def link_entity(sentences):
 
             ent_ids = wikidata_query(ent.text, ent.type)
             for ent_id in ent_ids:
-                # print(ent_url)
                 ent_url = transfer_id2url(ent_id)
                 ent_soup = parse_url(ent_url)
                 ent_brief = get_wikidata_brief(ent_soup)
@@ -27,9 +28,11 @@ def link_entity(sentences):
                 briefs.append(ent_brief)
                 wikipedia_urls.append(ent_wikipedia_url)
 
-            pairs = [(sent, brief) for brief in briefs]
+            pairs = [(sent.text, b) for b in briefs]
             similarities = cal_sentence_similarity(pairs)
-            idx = similarities.index(max(similarities))
-            entity_map.add((ent.text, wikipedia_urls[idx]))
+            if len(similarities) > 0:
+                # only link if there is query result
+                idx = np.argmax(similarities)
+                entity_map.add((ent.text, wikipedia_urls[idx]))
 
     return entity_map
