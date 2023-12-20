@@ -6,14 +6,6 @@ stanza.download('en')  # download English model
 # initialize English neural pipeline
 nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
 
-# text = "Trump is a Republican."
-#
-# doc = nlp(text)
-#
-# for sentence in doc.sentences:
-#     for entity in sentence.ents:
-#         print(f"text: {entity.text}\ttype: {entity.type}.")
-
 q = "Is Rome the capital of Italy?"
 a = (
     "surely it is but many don’t know this fact that Italy was not always called as Italy. Before Italy came "
@@ -25,14 +17,6 @@ q_doc = nlp(q)
 a_doc = nlp(a)
 
 sentences = q_doc.sentences + a_doc.sentences
-
-# print(type(q_doc.sentences))
-# for sent in q_doc.sentences:
-#     sentences.append(sent)
-#
-# for sent in a_doc.sentences:
-#     sentences.append(sent)
-
-# print(sentences)
 ent_map = link_entity(sentences)
+
 print(ent_map)

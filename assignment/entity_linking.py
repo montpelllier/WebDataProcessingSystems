@@ -12,10 +12,10 @@ def transfer_id2url(wikidata_ent_id):
 
 def link_entity(sentences):
     entity_map = set()
+
     for sent in sentences:
-        # print(sent)
         for ent in sent.ents:
-            print(ent.text + ":" + sent.text)
+            # print(ent.text + ":" + sent.text)
             briefs = []
             wikipedia_urls = []
 
