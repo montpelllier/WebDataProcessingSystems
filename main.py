@@ -4,8 +4,12 @@ from example_using_llm import get_completion
 from assignment.answer_extractor import get_entities, answer_extractor
 from entity_linking import entity_linking, question_entity_linking
 import stanza
+import nltk
+nltk.download('punkt')
+
 #modify the input file path
 INPUT_FILE = 'example_input.txt'
+
 def main():
     # stanza.download('en')
     # generate question and answer
