@@ -11,7 +11,7 @@ from assignment.html_parser import *
 
 stanza.download('en')  # download English model
 # initialize English neural pipeline
-nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma', download_method=None)
+nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,ner,pos,lemma', download_method=None)
 URL = "https://www.wikidata.org/w/api.php"
 NIL = {'id': None, 'name': None, 'link': None}
 
