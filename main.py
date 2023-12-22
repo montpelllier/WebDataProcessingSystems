@@ -12,37 +12,39 @@ def main():
     with open('example_input.txt', 'r') as file:
         questions = file.readlines()
     for q in questions:
-        q = q.strip()
-        question_id, question = q.split('\t')
-        # print("Question ID:", question_id)
-        # print("Question Text:", question)
-        answer = get_completion(question)
-        # print("question", question)
-        print("Text returned by the language model", question_id, answer)
+        try:
+            q = q.strip()
+            question_id, question = q.split('\t')
+            # print("Question ID:", question_id)
+            # print("Question Text:", question)
+            answer = get_completion(question)
+            # print("question", question)
+            print("Text returned by the language model", question_id, answer)
 
-    # entity_linking
-        entity_linking_result = entity_linking(question, answer)
-        # questionclassify = question_classification(question)
+        # entity_linking
+            entity_linking_result = entity_linking(question, answer)
+            # questionclassify = question_classification(question)
 
-        print("Entities extracted",question_id, entity_linking_result)
-    # factchecking
-        q_doc = trans_to_doc(question)
-        entity_question = get_entities(q_doc)
-        entity_question_link = question_entity_linking(q_doc)
-        extracted_answer  = answer_extractor(question,answer)
+            print("Entities extracted",question_id, entity_linking_result)
+        # factchecking
+            q_doc = trans_to_doc(question)
+            entity_question = get_entities(q_doc)
+            entity_question_link = question_entity_linking(q_doc)
+            extracted_answer  = answer_extractor(question,answer)
 
-        # test
-        # print("q_doc", q_doc)
-        # print("question entity",entity_question)
-        # print("question entity link",question_id,entity_question_link)
-        print("extracted answer",question_id,extracted_answer)
+            # test
+            # print("q_doc", q_doc)
+            # print("question entity",entity_question)
+            # print("question entity link",question_id,entity_question_link)
+            print("extracted answer",question_id,extracted_answer)
 
-        factcheck = fact_checking(question, entity_question, entity_question_link, extracted_answer)
-        # print("answer", answer)
-        # print("question classify:", questionclassify)
-        print("Correctness of the answer: ",question_id,factcheck)
+            factcheck = fact_checking(question, entity_question, entity_question_link, extracted_answer)
+            # print("answer", answer)
+            # print("question classify:", questionclassify)
+            print("Correctness of the answer: ",question_id,factcheck)
 
-
+        except Exception as e:
+            print(f"An error occurred for Question ID {question_id}: {e}")
 
 
 def trans_to_doc(ques):
