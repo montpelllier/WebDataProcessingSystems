@@ -82,32 +82,13 @@ def result_similarity_score(text1, text2):
     return similarity_score
 
 
-if __name__ == '__main__':
-
-    # question = "Is Beijing the capital of China?"
-    question = "Why is the sky blue?"
-
-    # entity_question = ['sky', 'capital', 'Beijing']
-    # entity_question_link = ["https://en.wikipedia.org/wiki/China", "https://en.wikipedia.org/wiki/capital", "https://en.wikipedia.org/wiki/Beijing"]
-    
-    entity_question = ['sky', 'blue']
-    entity_question_link = ["https://en.wikipedia.org/wiki/sky", "https://en.wikipedia.org/wiki/blue"]
-    
+def fact_checking(question, entity_question, entity_question_link, extracted_answer):
     keywords = entity_question
-
-    # entity_answer = ['Beijing', 'capital', 'China']
-
-    # extracted_answer = "yes"
-    extracted_answer = "https://en.wikipedia.org/wiki/sky"
-
-
     all_keywords_contents = ""
     for entity_link in entity_question_link:
         entity_content = get_wikipedia_page_content(entity_link)
         keywords_contents = extract_content_with_keywords(entity_content, keywords)
         all_keywords_contents += keywords_contents
-
-    # print(all_keywords_contents)
 
     if extracted_answer == "yes" or extracted_answer == "no":
         yesno_boolQ = get_boolQ_predict(question, all_keywords_contents)
@@ -123,6 +104,51 @@ if __name__ == '__main__':
         # print(extracted_keywords_contents, all_keywords_contents, similarity)
 
         if similarity > 0.7:
-            print("Correct")
+            print ("Correct")
         else:
-            print("Incorrect")
+            print ("Incorrect")
+        
+# if __name__ == '__main__':
+
+#     # question = "Is Beijing the capital of China?"
+#     question = "Why is the sky blue?"
+
+#     # entity_question = ['sky', 'capital', 'Beijing']
+#     # entity_question_link = ["https://en.wikipedia.org/wiki/China", "https://en.wikipedia.org/wiki/capital", "https://en.wikipedia.org/wiki/Beijing"]
+    
+#     entity_question = ['sky', 'blue']
+#     entity_question_link = ["https://en.wikipedia.org/wiki/sky", "https://en.wikipedia.org/wiki/blue"]
+    
+#     keywords = entity_question
+
+#     # entity_answer = ['Beijing', 'capital', 'China']
+
+#     # extracted_answer = "yes"
+#     extracted_answer = "https://en.wikipedia.org/wiki/sky"
+
+
+#     all_keywords_contents = ""
+#     for entity_link in entity_question_link:
+#         entity_content = get_wikipedia_page_content(entity_link)
+#         keywords_contents = extract_content_with_keywords(entity_content, keywords)
+#         all_keywords_contents += keywords_contents
+
+#     # print(all_keywords_contents)
+
+#     if extracted_answer == "yes" or extracted_answer == "no":
+#         yesno_boolQ = get_boolQ_predict(question, all_keywords_contents)
+#         if yesno_boolQ == extracted_answer:
+#             print("Correct")
+#         else:
+#             print("Incorrect")
+
+#     else:
+#         extracted_content = get_wikipedia_page_content(extracted_answer)
+#         extracted_keywords_contents = extract_content_with_keywords(extracted_content, keywords)
+#         similarity = result_similarity_score(extracted_keywords_contents, all_keywords_contents)
+#         # print(extracted_keywords_contents, all_keywords_contents, similarity)
+
+#         if similarity > 0.7:
+#             print("Correct")
+#         else:
+#             print("Incorrect")

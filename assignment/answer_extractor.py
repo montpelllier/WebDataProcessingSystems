@@ -5,6 +5,8 @@ import stanza
 
 from assignment.question_classifier import *
 from assignment.sentence_similarity_calculator import *
+# from question_classifier import *
+# from sentence_similarity_calculator import *
 
 type_list = ["PERSON", "NORP", "ORG", "GPE", "LOC", ["FAC", "PRODUCT", "WORK_OF_ART", "LAW"], "EVENT", "LANGUAGE",
              "DATE", "PERCENT", "MONEY", "QUANTITY", "ORDINAL", ["CARDINAL", "TIME"]]
@@ -20,10 +22,12 @@ key_pos = ["NOUN", "PROPN", "ADJ", "ADV", "VERB"]
 def get_entities(doc):
     entities = []
     for sentence in doc.sentences:
+        # print(f"sentence: {sentence.text}") 
         for entity in sentence.ents:
             # print(f"entity: {entity.text}, type: {entity.type}")
             entities.append(entity.text)
     return entities
+            
 
 
 def extract_keywords_by_pos(doc):
@@ -233,3 +237,14 @@ if __name__ == "__main__":
          "monarch to be appointed as president of the Netherlands, and she played a significant role in the country's "
          "history, particularly during World War II.")
     test(q, a)
+
+
+def answer_extractor(question, answer):
+    stanza.download('en')  # download English model
+    # initialize English neural pipeline
+    nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
+    q_doc = nlp(question)
+    a_doc = nlp(answer)
+    # print(f"extracted: {extract_answer(q_doc, a_doc)}\n")
+    return extract_answer(q_doc, a_doc)
+
