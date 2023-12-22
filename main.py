@@ -42,8 +42,8 @@ def main():
             # print("answer", answer)
             # print("question classify:", questionclassify)
             print("Correctness of the answer: ",question_id,factcheck)
-        except:
-            print({question_id: "error"})
+        except Exception as e:
+            print(question_id,f"An error occurred: {e}. Skipping this question.")
 
 
 def trans_to_doc(ques):
