@@ -227,12 +227,11 @@ def entity_linking(question, answer):
     sentences = q_doc.sentences + a_doc.sentences
 
     ents = set(get_entities(q_doc) + get_entities(a_doc))
-    # print("mention:", ents)
 
     entity_map = {}
     for ent in ents:
-        if ent.text not in entity_map.keys():
-            entity_map[ent.text] = link_entity(sentences, ent)
+        if ent not in entity_map.keys():
+            entity_map[ent] = link_entity(sentences, ent)
     # print("entity_map:", entity_map)
     return entity_map
 
