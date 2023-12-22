@@ -7,6 +7,7 @@ import stanza
 
 
 def main():
+    # stanza.download('en')
     # generate question and answer
     # question = input("Type your question and type ENTER to finish:\n")
     # question = "What is the capital of China?"
