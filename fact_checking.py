@@ -104,9 +104,9 @@ def fact_checking(question, entity_question, entity_question_link, extracted_ans
         # print(extracted_keywords_contents, all_keywords_contents, similarity)
 
         if similarity > 0.7:
-            return ("Correct")
+            print ("Correct")
         else:
-            return ("Incorrect")
+            print ("Incorrect")
         
 # if __name__ == '__main__':
 
