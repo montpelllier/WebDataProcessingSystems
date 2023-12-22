@@ -5,7 +5,9 @@ docker pull karmaresearch/wdps2
 docker run -ti karmaresearch/wdps2
 
 1.Install dependencies in requirements.txt
-Set the PIP_PATH in 'install_dependencies.sh', default is './app/venv/bin/pip'.
+
+Set the PIP_PATH in 'install_dependencies.sh', default is './app/venv/bin/pip'
+
 Run the scripts:
 ```
 chmod +x install_dependencies.sh
