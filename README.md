@@ -13,7 +13,13 @@ Run the scripts:
 chmod +x install_dependencies.sh
 ./install_dependencies.sh
 ```
-2.Set the path for input and output
+2.Set the path for input and output in main.py
+
+For example,
+```
+INPUT_PATH = "example_input.txt"
+OUTPUT_PATH = "output.txt
+```
 
 3.Run the project
 ```
