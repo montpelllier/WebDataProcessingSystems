@@ -18,7 +18,9 @@ negative_words = ["no", "not", "never", "none", "neither", "nor", "without", "de
 # 选取名词、代词、副词、形容词、动词作为keyword
 key_pos = ["NOUN", "PROPN", "ADJ", "ADV", "VERB"]
 
-
+stanza.download('en')  # download English model
+    # initialize English neural pipeline
+nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
 def get_entities(doc):
     entities = []
     for sentence in doc.sentences:
@@ -240,9 +242,6 @@ if __name__ == "__main__":
 
 
 def answer_extractor(question, answer):
-    stanza.download('en')  # download English model
-    # initialize English neural pipeline
-    nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
     q_doc = nlp(question)
     a_doc = nlp(answer)
     # print(f"extracted: {extract_answer(q_doc, a_doc)}\n")

@@ -11,9 +11,9 @@ from assignment.html_parser import *
 
 stanza.download('en')  # download English model
 # initialize English neural pipeline
-nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
+nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma', download_method=None)
 URL = "https://www.wikidata.org/w/api.php"
-
+NIL =  {'id': None, 'name': None, 'link': None}
 
 # 对于每个entity mention，生成一组候选entity
 
@@ -188,7 +188,7 @@ def link_entity(sentences, entity):
         select = candidates_ranking(candidates_list, entity, context)
     # print(candidates_list)
     else:
-        raise ValueError("NIL")
+        select = NIL
     return select
 
 
@@ -223,10 +223,7 @@ def entity_linking(question,answer):
     sentences = q_doc.sentences + a_doc.sentences
 
     ents = set(get_entities(q_doc) + get_entities(a_doc))
-    if ents:
-        pass
-    else:
-        print("!!!There is no entity")
+    print("mention:", ents)
     entities = []
     for ent in ents:
         # print(ent)
@@ -236,7 +233,6 @@ def entity_linking(question,answer):
 def question_entity_linking(question):
     q_doc = question
     ents = set(get_entities(q_doc))
-    print("mention:", ents)
     q_link = []
     for ent in ents:
         link = link_entity(q_doc.sentences, ent)
