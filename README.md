@@ -5,7 +5,7 @@ docker pull karmaresearch/wdps2
 docker run -ti karmaresearch/wdps2
 
 install dependencies in requirement.txt
-'''
+```
 chmod +x install_dependencies.sh
 ./install_dependencies.sh
-'''
+```
