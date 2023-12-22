@@ -7,3 +7,4 @@ nltk==3.8.1
 torch~=2.0
 scikit-learn~=1.1.1
 sentence-transformers~=2.2.2
+Levenshtein~=0.23.0
