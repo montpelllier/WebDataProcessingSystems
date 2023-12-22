@@ -45,7 +45,8 @@ def main():
         except:
             print({question_id: "error"})
 
-
+        except Exception as e:
+            print(f"An error occurred for Question ID {question_id}: {e}")
 
 
 def trans_to_doc(ques):
