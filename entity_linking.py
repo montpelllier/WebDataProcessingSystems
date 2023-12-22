@@ -13,12 +13,13 @@ stanza.download('en')  # download English model
 # initialize English neural pipeline
 nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma', download_method=None)
 URL = "https://www.wikidata.org/w/api.php"
-NIL =  {'id': None, 'name': None, 'link': None}
+NIL = {'id': None, 'name': None, 'link': None}
+
 
 # 对于每个entity mention，生成一组候选entity
 
 def generate_entity_candidate(entity, num=10):
-    print("mention:",entity)
+    print("mention:", entity)
 
     S = requests.Session()
 
@@ -109,6 +110,7 @@ def candidates_ranking(candidates_list, mention, context):
         name = candidate['name']
 
         content = get_candidate_context(candidate)
+        print(content)
         candidate_context = extract_content_with_entity(content, mention)
         similarity = compute_similarity_bow(candidate_context, context)
         string_match_score = levenshtein_distance(mention, name)
@@ -127,10 +129,13 @@ def extract_content_with_entity(content, entity, max_n=1):
     """
     extract sentences containing keywords
     """
+    print(content)
     sentences = sent_tokenize(content)
+    print(sentences)
     selected_sentences = ""
     n = 0
     for sent in sentences:
+        print(sent)
         if str.lower(entity) in str.lower(sent):
             n += 1
             selected_sentences += sent + " "
@@ -139,6 +144,7 @@ def extract_content_with_entity(content, entity, max_n=1):
 
     # Remove trailing space
     selected_sentences = selected_sentences.strip()
+    print(selected_sentences)
     return selected_sentences
 
 
@@ -207,28 +213,28 @@ def link_entity(sentences, entity):
 #         print(ent)
 #         link_entity(sentences, ent)
 
-    # candidates_list = generate_entity_candidate("nicaragua")
-    # context = get_mention_context(sentences, "nicaragua")
-    # select = candidates_ranking(candidates_list, "nicaragua", context)
+# candidates_list = generate_entity_candidate("nicaragua")
+# context = get_mention_context(sentences, "nicaragua")
+# select = candidates_ranking(candidates_list, "nicaragua", context)
 
 
-
-
-def entity_linking(question,answer):
+def entity_linking(question, answer):
     q = question
     a = answer
-    
+
     q_doc = nlp(q)
     a_doc = nlp(a)
     sentences = q_doc.sentences + a_doc.sentences
 
     ents = set(get_entities(q_doc) + get_entities(a_doc))
     print("mention:", ents)
-    entities = []
+
+    entity_map = {}
     for ent in ents:
-        # print(ent)
-        entities.append(link_entity(sentences, ent))
-    return entities
+        if ent.text not in entity_map.keys():
+            entity_map[ent.text] = link_entity(sentences, ent)
+    return entity_map
+
 
 def question_entity_linking(question):
     q_doc = question
@@ -237,8 +243,7 @@ def question_entity_linking(question):
     for ent in ents:
         link = link_entity(q_doc.sentences, ent)
         q_link.append(link['link'])
-    return q_link 
-        
-        
-        # return link_entity(q_doc.sentences, ent)
+    return q_link
+
+    # return link_entity(q_doc.sentences, ent)
 # question_entity_linking("Managua is not the capital of Nicaragua. Yes or no?")
