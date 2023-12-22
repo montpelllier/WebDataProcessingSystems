@@ -15,7 +15,7 @@ URL = "https://www.wikidata.org/w/api.php"
 
 
 # 对于每个entity mention，生成一组候选entity
-def generate_entity_candidate(entity, num=50):
+def generate_entity_candidate(entity, num=1):
     S = requests.Session()
 
     PARAMS = {
@@ -74,12 +74,12 @@ def get_wikipedia_link(candidate):
 #         "bltitle": wikipedia_link,
 #         "bllimit": "max"
 #     }
-#
+
 #     response = session.get(url=URL, params=PARAMETERS)
 #     data = response.json()
-#
+
 #     backlinks = data['query']['backlinks']  # Find all pages that link to the given page.
-#
+
 #     # #解析http页面链接
 #     # response = requests.get(wikipedia_link)
 #     # soup = BeautifulSoup(response.text, 'html.parser')
@@ -184,20 +184,20 @@ def link_entity(sentences, entity):
     return select
 
 
-if __name__ == '__main__':
-    q = "Managua is not the capital of Nicaragua. Yes or no?"
-    a = ("Most people think Managua is the capital of Nicaragua. However, Managua is not the capital of Nicaragua. The "
-         "capital of Nicaragua is Managua. The capital of Nicaragua is Managua. Managua is the capital of Nicaragua. "
-         "The capital")
+# if __name__ == '__main__':
+#     q = "Managua is not the capital of Nicaragua. Yes or no?"
+#     a = ("Most people think Managua is the capital of Nicaragua. However, Managua is not the capital of Nicaragua. The "
+#          "capital of Nicaragua is Managua. The capital of Nicaragua is Managua. Managua is the capital of Nicaragua. "
+#          "The capital")
 
-    q_doc = nlp(q)
-    a_doc = nlp(a)
-    sentences = q_doc.sentences + a_doc.sentences
+#     q_doc = nlp(q)
+#     a_doc = nlp(a)
+#     sentences = q_doc.sentences + a_doc.sentences
 
-    ents = set(get_entities(q_doc) + get_entities(a_doc))
-    for ent in ents:
-        print(ent)
-        link_entity(sentences, ent)
+#     ents = set(get_entities(q_doc) + get_entities(a_doc))
+#     for ent in ents:
+#         print(ent)
+#         link_entity(sentences, ent)
 
     # candidates_list = generate_entity_candidate("nicaragua")
     # context = get_mention_context(sentences, "nicaragua")
@@ -221,14 +221,16 @@ def entity_linking(question,answer):
         return link_entity(sentences, ent)
 
 def question_entity_linking(question):
-    # q = question
-    q_doc = nlp(q)
+    q_doc = question
     ents = set(get_entities(q_doc))
+    q_link = []
     for ent in ents:
         print(ent)
-        link_entity(q_doc.sentences, ent)
-        print(link_entity(q_doc.sentences, ent))
+        link = link_entity(q_doc.sentences, ent)
+        q_link.append(link['link'])
+    return q_link 
+        
         
         # return link_entity(q_doc.sentences, ent)
-question_entity_linking("Managua is not the capital of Nicaragua. Yes or no?")
+# question_entity_linking("Managua is not the capital of Nicaragua. Yes or no?")
 

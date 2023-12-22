@@ -19,7 +19,7 @@ def main():
     q_doc = trans_to_doc(question)
     entity_question = get_entities(q_doc)
     entity_question_link = question_entity_linking(q_doc)
-    extracted_answer  = answer_extractor(answer)
+    extracted_answer  = answer_extractor(question,answer)
 
     # test
     # print("question", question)
@@ -30,7 +30,7 @@ def main():
     factcheck = fact_checking(question, entity_question, entity_question_link, extracted_answer)
     # print("answer", answer)
     # print("question classify:", questionclassify)
-    # print("factchecking",factcheck)
+    print("factchecking",factcheck)
 
 # 
 
