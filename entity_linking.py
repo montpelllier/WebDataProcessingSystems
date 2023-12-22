@@ -19,7 +19,7 @@ NIL = {'id': None, 'name': None, 'link': None}
 # 对于每个entity mention，生成一组候选entity
 
 def generate_entity_candidate(entity, num=10):
-    print("mention:", entity)
+    # print("mention:", entity)
 
     S = requests.Session()
 
