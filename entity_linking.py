@@ -110,7 +110,7 @@ def candidates_ranking(candidates_list, mention, context):
         name = candidate['name']
 
         content = get_candidate_context(candidate)
-        print(content)
+        # print(content)
         candidate_context = extract_content_with_entity(content, mention)
         similarity = compute_similarity_bow(candidate_context, context)
         string_match_score = levenshtein_distance(mention, name)
@@ -129,13 +129,13 @@ def extract_content_with_entity(content, entity, max_n=1):
     """
     extract sentences containing keywords
     """
-    print(content)
+    # print(content)
     sentences = sent_tokenize(content)
-    print(sentences)
+    # print(sentences)
     selected_sentences = ""
     n = 0
     for sent in sentences:
-        print(sent)
+        # print(sent)
         if str.lower(entity) in str.lower(sent):
             n += 1
             selected_sentences += sent + " "
@@ -144,7 +144,7 @@ def extract_content_with_entity(content, entity, max_n=1):
 
     # Remove trailing space
     selected_sentences = selected_sentences.strip()
-    print(selected_sentences)
+    # print(selected_sentences)
     return selected_sentences
 
 
@@ -227,12 +227,13 @@ def entity_linking(question, answer):
     sentences = q_doc.sentences + a_doc.sentences
 
     ents = set(get_entities(q_doc) + get_entities(a_doc))
-    print("mention:", ents)
+    # print("mention:", ents)
 
     entity_map = {}
     for ent in ents:
         if ent.text not in entity_map.keys():
             entity_map[ent.text] = link_entity(sentences, ent)
+    # print("entity_map:", entity_map)
     return entity_map
 
 
@@ -247,3 +248,5 @@ def question_entity_linking(question):
 
     # return link_entity(q_doc.sentences, ent)
 # question_entity_linking("Managua is not the capital of Nicaragua. Yes or no?")
+
+

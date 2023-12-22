@@ -4,14 +4,14 @@ from example_using_llm import get_completion
 from assignment.answer_extractor import get_entities, answer_extractor
 from entity_linking import entity_linking, question_entity_linking
 import stanza
-
-
+#modify the input file path
+INPUT_FILE = 'example_input.txt'
 def main():
     # stanza.download('en')
     # generate question and answer
     # question = input("Type your question and type ENTER to finish:\n")
     # question = "What is the capital of China?"
-    with open('example_input.txt', 'r') as file:
+    with open(INPUT_FILE, 'r') as file:
         questions = file.readlines()
     for q in questions:
         try:
