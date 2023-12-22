@@ -9,8 +9,10 @@ def main():
 
 # generate question and answer
     # question = input("Type your question and type ENTER to finish:\n")
-    question = "Is Beijing the capital of China?"
+    question = "What is the capital of China?"
     answer = get_completion(question)
+    print("question", question)
+    print("answer", answer)
 
 # entity_linking
     # entity_linking = entity_linking(question, answer)
@@ -23,10 +25,10 @@ def main():
     extracted_answer  = answer_extractor(question,answer)
 
     # test
-    # print("question", question)
     # print("q_doc", q_doc)
     # print("question entity",entity_question)
     print("question entity link",entity_question_link)
+    print("extracted answer",extracted_answer)
 
     factcheck = fact_checking(question, entity_question, entity_question_link, extracted_answer)
     # print("answer", answer)
