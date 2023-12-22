@@ -142,7 +142,7 @@ def get_candidate_context(candidate):
     soup = parse_url(url)
     whole_content = get_wikipedia_page_content(soup)
     whole_content = ' '.join(whole_content)
-    selected_content = extract_content_with_entity(whole_content, candidate['name'], max_n=5)
+    selected_content = extract_content_with_entity(whole_content, candidate['name'], max_n=3)
     return selected_content
 
 
