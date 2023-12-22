@@ -227,10 +227,11 @@ def entity_linking(question,answer):
         pass
     else:
         print("!!!There is no entity")
+    entities = []
     for ent in ents:
         # print(ent)
-        link_entity(sentences, ent)
-
+        entities.append(link_entity(sentences, ent))
+    return entities
 
 def question_entity_linking(question):
     q_doc = question
