@@ -37,9 +37,14 @@ def main():
             # print("q_doc", q_doc)
             # print("question entity",entity_question)
             # print("question entity link",question_id,entity_question_link)
-            print("extracted answer", question_id, extracted_answer, entity_linking_result[extracted_answer])
+            if extracted_answer == "yes" or extracted_answer == "no":
+                print("extracted answer", question_id, extracted_answer)
+                factcheck = fact_checking(question, entity_question, entity_question_link, extracted_answer)
 
-            factcheck = fact_checking(question, entity_question, entity_question_link, extracted_answer)
+            else:
+                ans_link = entity_linking_result[extracted_answer]
+                print("extracted answer", question_id, extracted_answer, ans_link)
+                factcheck = fact_checking(question, entity_question, entity_question_link, ans_link)
             # print("answer", answer)
             # print("question classify:", questionclassify)
             print("Correctness of the answer: ", question_id, factcheck)
