@@ -195,6 +195,7 @@ if __name__ == '__main__':
 
     ents = set(get_entities(q_doc) + get_entities(a_doc))
     for ent in ents:
+        print(ent)
         link_entity(sentences, ent)
 
     # candidates_list = generate_entity_candidate("nicaragua")
