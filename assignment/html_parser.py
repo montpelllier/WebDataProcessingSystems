@@ -36,7 +36,10 @@ def get_wikipedia_page_content(soup):
     # 找到该 div 元素下的所有 <p> 元素
     paragraphs = content_div.find_all('p')
     # 提取每个 <p> 元素的文本内容
-    paragraph_texts = [paragraph.get_text() for paragraph in paragraphs]
+    paragraph_texts = []
+    for paragraph in paragraphs:
+        if len(paragraph.get_text()) >= 20:
+            paragraph_texts.append(paragraph.get_text())
 
     return paragraph_texts
 
