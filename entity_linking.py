@@ -5,6 +5,7 @@ from Levenshtein import distance as levenshtein
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from assignment.answer_extractor import get_entities
 from assignment.html_parser import *
 
 stanza.download('en')  # download English model
@@ -175,6 +176,13 @@ def levenshtein_distance(mention, candidate):
     return 1 - (dist / max_len)
 
 
+def link_entity(sentences, entity):
+    candidates_list = generate_entity_candidate(entity)
+    context = get_mention_context(sentences, entity)
+    select = candidates_ranking(candidates_list, entity, context)
+    print(select)
+
+
 if __name__ == '__main__':
     q = "Managua is not the capital of Nicaragua. Yes or no?"
     a = ("Most people think Managua is the capital of Nicaragua. However, Managua is not the capital of Nicaragua. The "
@@ -185,7 +193,11 @@ if __name__ == '__main__':
     a_doc = nlp(a)
     sentences = q_doc.sentences + a_doc.sentences
 
-    candidates_list = generate_entity_candidate("nicaragua")
-    context = get_mention_context(sentences, "nicaragua")
-    select = candidates_ranking(candidates_list, "nicaragua", context)
-    print(select)
+    ents = set(get_entities(q_doc) + get_entities(a_doc))
+    for ent in ents:
+        link_entity(sentences, ent)
+
+    # candidates_list = generate_entity_candidate("nicaragua")
+    # context = get_mention_context(sentences, "nicaragua")
+    # select = candidates_ranking(candidates_list, "nicaragua", context)
+
