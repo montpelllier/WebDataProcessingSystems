@@ -17,7 +17,8 @@ URL = "https://www.wikidata.org/w/api.php"
 
 # 对于每个entity mention，生成一组候选entity
 
-def generate_entity_candidate(entity, num=1):
+def generate_entity_candidate(entity, num=10):
+    print("mention:",entity)
 
     S = requests.Session()
 
@@ -41,6 +42,7 @@ def generate_entity_candidate(entity, num=1):
                 {'id': candidate['id'], 'name': candidate['display']['label']['value'], 'link': wikipedia_link})
         else:
             candidate_list.remove(candidate)
+    # print(candidate_final_list)
     return candidate_final_list
 
 
@@ -171,8 +173,8 @@ def compute_similarity_bow(context_a, context_b):
 
 def levenshtein_distance(mention, candidate):
     # 去除非字母字符
-    mention = re.sub(r'[^a-zA-Z]', '', mention)
-    candidate = re.sub(r'[^a-zA-Z]', '', candidate)
+    mention = re.sub(r'[^a-zA-Z0-9]', '', mention)
+    candidate = re.sub(r'[^a-zA-Z0-9]', '', candidate)
     # 计算Levenshtein距离
     dist = levenshtein(mention.lower(), candidate.lower())
     max_len = max(len(mention), len(candidate))
@@ -181,9 +183,12 @@ def levenshtein_distance(mention, candidate):
 
 def link_entity(sentences, entity):
     candidates_list = generate_entity_candidate(entity)
-    context = get_mention_context(sentences, entity)
-    select = candidates_ranking(candidates_list, entity, context)
-    # print(select)
+    if candidates_list:
+        context = get_mention_context(sentences, entity)
+        select = candidates_ranking(candidates_list, entity, context)
+    # print(candidates_list)
+    else:
+        raise ValueError("NIL")
     return select
 
 
@@ -218,17 +223,21 @@ def entity_linking(question,answer):
     sentences = q_doc.sentences + a_doc.sentences
 
     ents = set(get_entities(q_doc) + get_entities(a_doc))
+    if ents:
+        pass
+    else:
+        print("!!!There is no entity")
     for ent in ents:
-        print(ent)
+        # print(ent)
         link_entity(sentences, ent)
 
 
 def question_entity_linking(question):
     q_doc = question
     ents = set(get_entities(q_doc))
+    print("mention:", ents)
     q_link = []
     for ent in ents:
-        print(ent)
         link = link_entity(q_doc.sentences, ent)
         q_link.append(link['link'])
     return q_link 
