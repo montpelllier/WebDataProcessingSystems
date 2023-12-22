@@ -4,6 +4,7 @@ import stanza
 from Levenshtein import distance as levenshtein
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from nltk.tokenize import sent_tokenize
 
 from assignment.answer_extractor import get_entities
 from assignment.html_parser import *
@@ -124,13 +125,13 @@ def extract_content_with_entity(content, entity, max_n=1):
     """
     extract sentences containing keywords
     """
-    wiki_doc = nlp(content)
+    sentences = sent_tokenize(content)
     selected_sentences = ""
     n = 0
-    for sent in wiki_doc.sentences:
-        if str.lower(entity) in str.lower(sent.text):
+    for sent in sentences:
+        if str.lower(entity) in str.lower(sent):
             n += 1
-            selected_sentences += sent.text + " "
+            selected_sentences += sent + " "
             if n == max_n:
                 break
 
