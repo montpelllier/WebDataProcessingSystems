@@ -3,12 +3,13 @@ from sklearn.metrics import accuracy_score, f1_score
 from QCmodel import question_classification
 from fact_checking import fact_checking
 from example_using_llm import get_completion
-from answer_extractor import get_entities, answer_extractor
+from answer_extractor import *
 from entity_linking import entity_linking, question_entity_linking
 import stanza
 import nltk
 
 nltk.download('punkt')
+nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
 
 # modify the input file path
 INPUT_FILE = 'testdata_input.txt'
@@ -44,10 +45,11 @@ def main():
 
                 # print("Entities extracted", question_id, entity_linking_result)
                 # factchecking
-                q_doc = trans_to_doc(question)
+                q_doc = nlp(question)
+                a_doc = nlp(answer)
                 entity_question = get_entities(q_doc)
                 entity_question_link = question_entity_linking(q_doc)
-                extracted_answer = answer_extractor(question, answer)
+                extracted_answer = extract_answer(q_doc, a_doc)
                 output_file.write(f"{question_id}\tA\"{extracted_answer}\"\n")
 
                 # test
@@ -82,12 +84,6 @@ def main():
     print(f"E:Precision: {precision}")
     print(f"E:Recall: {recall}")
     print(f"E:F1 Score: {f1}")
-
-
-def trans_to_doc(ques):
-    nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
-    q_doc = nlp(ques)
-    return q_doc
 
 
 def read_output_file(filename):
