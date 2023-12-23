@@ -26,8 +26,8 @@ def main():
                 q = q.strip()
                 question_id, question = q.split('\t')
                 answer = get_completion(question)
-                print("question: ", question)
-                print("answer: ", answer)
+                # print("question: ", question)
+                # print("answer: ", answer)
                 # output_file.write(f"{question_id}\tR\"{answer}\"\n")
                 # question_classify = question_classification(question)
 
@@ -39,17 +39,17 @@ def main():
 
                 entity_question = get_entities(q_doc)
                 entity_question_link = question_entity_linking(q_doc)
-                extracted_answer = extract_answer(q_doc, a_doc)
+                extracted_answer = extract_answer(q_doc, a_doc,entity_linking_result)
                 output_file.write(f"{question_id}\tA\"{extracted_answer}\"\n")
 
                 # test
                 if extracted_answer == "yes" or extracted_answer == "no":
-                    print("extracted answer", question_id, extracted_answer)
+                    # print("extracted answer", question_id, extracted_answer)
                     factcheck = fact_checking(question, entity_question, entity_question_link, extracted_answer)
 
                 else:
                     ans_link = entity_linking_result[extracted_answer]['link']
-                    print("extracted answer", question_id, extracted_answer, ans_link)
+                    # print("extracted answer", question_id, extracted_answer, ans_link)
                     factcheck = fact_checking(question, entity_question, entity_question_link, ans_link)
 
                 output_file.write(f"{question_id}\tC\"{factcheck}\"\n")

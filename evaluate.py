@@ -12,7 +12,7 @@ nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentimen
 # modify the input file path
 INPUT_FILE = 'testdata20_input.txt'
 GT_FILE = 'testdata20_gt.txt'
-OUTPUT_FILE = 'output.txt'
+OUTPUT_FILE = 'output_evaluate.txt'
 
 
 def main():
@@ -45,7 +45,7 @@ def main():
 
                 entity_question = get_entities(q_doc)
                 entity_question_link = question_entity_linking(q_doc)
-                extracted_answer = extract_answer(q_doc, a_doc)
+                extracted_answer = extract_answer(q_doc, a_doc,entity_linking_result)
                 # output_file.write(f"{question_id}\tA\"{extracted_answer}\"\n")
 
                 # test
@@ -68,7 +68,7 @@ def main():
                 print("factcheck: ", factcheck)
             # except Exception as e:
             #     print(question_id, f"An error occurred: {e}. Skipping this question.")
-
+    output_file.close()
     # 读取标准输出和预测输出
     pred_data = read_output_file(OUTPUT_FILE)  # 预测数据
 
@@ -119,13 +119,14 @@ def read_output_file(filename):
 
 def calculate_metrics_forC(true_data, pred_data):
     """计算准确率和F1分数。"""
+    print(true_data)
+    print(pred_data)
     true_labels = []
     pred_labels = []
     for qid in true_data:
         if qid in pred_data:
             true_labels.append(true_data[qid]['C'])
             pred_labels.append(pred_data[qid]['C'])
-
     accuracy = accuracy_score(true_labels, pred_labels)
     f1 = f1_score(true_labels, pred_labels, pos_label="correct")
 
