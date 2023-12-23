@@ -1,12 +1,10 @@
+import nltk
+import stanza
 from sklearn.metrics import accuracy_score, f1_score
 
-from QCmodel import question_classification
-from fact_checking import fact_checking
-from example_using_llm import get_completion
 from answer_extractor import *
 from entity_linking import entity_linking, question_entity_linking
-import stanza
-import nltk
+from fact_checking import fact_checking
 
 nltk.download('punkt')
 nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
@@ -25,7 +23,7 @@ def main():
     with open(INPUT_FILE, 'r') as file:
         questions = file.readlines()
     gt_data = read_output_file(GT_FILE)
-    with open(OUTPUT_FILE, 'w',encoding='utf-8') as output_file:
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as output_file:
         for q in questions:
             try:
                 q = q.strip()
@@ -69,7 +67,8 @@ def main():
                 # print("Correctness of the answer: ",question_id,factcheck)
                 output_file.write(f"{question_id}\tC\"{factcheck}\"\n")
                 for query in entity_linking_result.keys():
-                    output_file.write(f"{question_id}\tE\"{entity_linking_result[query]['name']}\"\t\"{entity_linking_result[query]['link']}\"\n")
+                    output_file.write(
+                        f"{question_id}\tE\"{entity_linking_result[query]['name']}\"\t\"{entity_linking_result[query]['link']}\"\n")
             except Exception as e:
                 print(question_id, f"An error occurred: {e}. Skipping this question.")
 

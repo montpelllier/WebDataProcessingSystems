@@ -9,9 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from answer_extractor import get_entities
 from html_parser import *
 
-stanza.download('en')  # download English model
-# initialize English neural pipeline
-nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,ner,pos,lemma', download_method=None)
+
 URL = "https://www.wikidata.org/w/api.php"
 NIL = {'id': None, 'name': None, 'link': None}
 

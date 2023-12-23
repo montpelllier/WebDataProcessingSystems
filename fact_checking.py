@@ -30,9 +30,9 @@ def get_wikipedia_page_content(url):
 
 
 def extract_content_with_keywords(content, keywords):
-    '''
+    """
     extract sentences containing keywords
-    '''
+    """
     sentences = sent_tokenize(content)
     selected_sentences = ""
 
@@ -96,9 +96,9 @@ def fact_checking(question, entity_question, entity_question_link, extracted_ans
     if extracted_answer == "yes" or extracted_answer == "no":
         yesno_boolQ = get_boolQ_predict(question, all_keywords_contents)
         if yesno_boolQ == extracted_answer:
-            return ("Correct")
+            return "Correct"
         else:
-            return ("Incorrect")
+            return "Incorrect"
 
     else:
         extracted_content = get_wikipedia_page_content(extracted_answer)
@@ -107,9 +107,9 @@ def fact_checking(question, entity_question, entity_question_link, extracted_ans
         # print(extracted_keywords_contents, all_keywords_contents, similarity)
 
         if similarity > 0.7:
-            return ("Correct")
+            return "Correct"
         else:
-            return ("Incorrect")
+            return "Incorrect"
 
 # if __name__ == '__main__':
 

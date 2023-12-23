@@ -48,7 +48,7 @@ def get_wikipedia_page_content(soup):
 
 if __name__ == "__main__":
     # url = "https://www.wikidata.org/wiki/Q2781527"
-    url = "http://www.wikidata.org/wiki/Q209878"
+    url = "https://www.wikidata.org/wiki/Q209878"
     soup = parse_url(url)
     if soup:
         wikipedia_url = get_wikipedia_url(soup)

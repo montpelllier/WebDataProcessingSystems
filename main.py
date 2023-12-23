@@ -27,9 +27,7 @@ def main():
                 answer = get_completion(question)
                 print("question: ", question)
                 print("answer: ", answer)
-                # output_file.write(f"{question_id}\tR\"{answer}\"\n")
-
-
+                output_file.write(f"{question_id}\tR\"{answer}\"\n")
                 # question_classify = question_classification(question)
 
                 # fact checking
@@ -52,19 +50,15 @@ def main():
                     ans_link = entity_linking_result[extracted_answer]['link']
                     print("extracted answer", question_id, extracted_answer, ans_link)
                     factcheck = fact_checking(question, entity_question, entity_question_link, ans_link)
-                # print("answer", answer)
-                # print("question classify:", questionclassify)
-                # print("Correctness of the answer: ",question_id,factcheck)
+
                 output_file.write(f"{question_id}\tC\"{factcheck}\"\n")
                 for query in entity_linking_result.keys():
                     output_file.write(f"{question_id}\tE\"{entity_linking_result[query]['name']}\"\t\"{entity_linking_result[query]['link']}\"\n")
 
                 print("factcheck: ", factcheck)
-                # output_file.write(f"{question_id}\tC\"{factcheck}\"\n")
-                # for entity in entity_question_link:
-                #     output_file.write(f"{question_id}\tE\"{entity['name']}\"\t\"{entity['link']}\"\n")
             except Exception as e:
                 print(question_id, f"An error occurred: {e}. Skipping this question.")
+            print("------------------------------------------------------------------")
 
 
 if __name__ == "__main__":
