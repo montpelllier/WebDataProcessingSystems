@@ -1,9 +1,9 @@
-from transformers import BartForConditionalGeneration, BartTokenizer, AutoModelForSequenceClassification, AutoTokenizer
-from sentence_transformers import SentenceTransformer, util
-import torch
-from nltk.tokenize import sent_tokenize
 import requests
+import torch
 from bs4 import BeautifulSoup
+from nltk.tokenize import sent_tokenize
+from sentence_transformers import SentenceTransformer, util
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
 def get_wikipedia_page_content(url):
@@ -98,7 +98,7 @@ def fact_checking(question, entity_question, entity_question_link, extracted_ans
         if yesno_boolQ == extracted_answer:
             return ("Correct")
         else:
-            return("Incorrect")
+            return ("Incorrect")
 
     else:
         extracted_content = get_wikipedia_page_content(extracted_answer)
@@ -110,7 +110,7 @@ def fact_checking(question, entity_question, entity_question_link, extracted_ans
             return ("Correct")
         else:
             return ("Incorrect")
-        
+
 # if __name__ == '__main__':
 
 #     # question = "Is Beijing the capital of China?"
