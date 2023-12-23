@@ -52,13 +52,10 @@ def classify_entity_question(question):
     path = transfer_relative_path(MODEL_PATH)
 
     model = AutoModelForSequenceClassification.from_pretrained(path)
-    # 加载tokenizer
+    # load tokenizer
     tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")  # 或者您使用的其他模型
-
-    # 准备输入数据
-    # question = "When is Chrismas day"  # modify here
     inputs = tokenizer(question, padding="max_length", truncation=True, max_length=128, return_tensors="pt")
-    # 生成预测
+    # predict
     with torch.no_grad():
         outputs = model(**inputs)
         predictions = torch.argmax(outputs.logits, dim=-1)
@@ -109,6 +106,3 @@ if __name__ == "__main__":
             print(label)
         elif q_type == 1:
             print("boolean question")
-
-# for q in questions:
-# 	classify_open_question(q)
