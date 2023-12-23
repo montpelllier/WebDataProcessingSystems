@@ -9,6 +9,26 @@ wikidata_values = {"PERSON": ["Q215627"], "NORP": ["Q231002", "Q111252415"], "OR
                    "QUANTITY": ["Q309314"], "ORDINAL": ["Q923933"], "CARDINAL": ["Q11563"], "TIME": ["Q11471"]}
 
 
+"""
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
+SELECT ?item ?itemLabel
+WHERE {
+  SERVICE wikibase:mwapi {
+    bd:serviceParam wikibase:api "EntitySearch" ; 
+                    wikibase:endpoint "www.wikidata.org" ; 
+                    mwapi:search "Italian Kingdom" ;
+                    mwapi:language "en" .
+    ?item wikibase:apiOutputItem mwapi:item.
+  }
+  ?item rdfs:label ?itemLabel.
+  FILTER(LANG(?itemLabel) = "en")
+}
+LIMIT 10
+"""
+
+
 def generate_conditions(entity_type: str):
     if not entity_type or entity_type not in wikidata_values.keys():
         return ""

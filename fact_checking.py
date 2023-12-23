@@ -22,7 +22,7 @@ def get_wikipedia_page_content(url):
         paragraph_texts = ""
 
         for paragraph in paragraphs:
-          paragraph_texts += paragraph.get_text() + ' '
+            paragraph_texts += paragraph.get_text() + ' '
         return paragraph_texts
     else:
         print(f"failed request: {response.status_code}")
@@ -52,7 +52,8 @@ def get_boolQ_predict(question, content):
     tokenizer = AutoTokenizer.from_pretrained("nfliu/roberta-large_boolq")
     model_boolQ = AutoModelForSequenceClassification.from_pretrained("nfliu/roberta-large_boolq")
 
-    sequence = tokenizer.encode_plus(question, content, return_tensors="pt", max_length=512, truncation=True)['input_ids']
+    sequence = tokenizer.encode_plus(question, content, return_tensors="pt", max_length=512, truncation=True)[
+        'input_ids']
     logits = model_boolQ(sequence)[0]
     probabilities = torch.softmax(logits, dim=1).detach().cpu().tolist()[0]
     proba_yes = round(probabilities[1], 2)
@@ -60,15 +61,17 @@ def get_boolQ_predict(question, content):
 
     # print(f"Question: {question}, Yes: {proba_yes}, No: {proba_no}")
 
-    if proba_yes >  proba_no:
+    if proba_yes > proba_no:
         return "yes"
     else:
         return "no"
+
 
 def encode_text(text):
     sim_model = SentenceTransformer('bert-base-nli-stsb-mean-tokens')
     encoded_text = sim_model.encode(text, convert_to_tensor=True)
     return encoded_text
+
 
 def get_similarity_score(embedding1, embedding2):
     cosine_scores = util.pytorch_cos_sim(embedding1, embedding2)
@@ -115,10 +118,10 @@ def fact_checking(question, entity_question, entity_question_link, extracted_ans
 
 #     # entity_question = ['sky', 'capital', 'Beijing']
 #     # entity_question_link = ["https://en.wikipedia.org/wiki/China", "https://en.wikipedia.org/wiki/capital", "https://en.wikipedia.org/wiki/Beijing"]
-    
+
 #     entity_question = ['sky', 'blue']
 #     entity_question_link = ["https://en.wikipedia.org/wiki/sky", "https://en.wikipedia.org/wiki/blue"]
-    
+
 #     keywords = entity_question
 
 #     # entity_answer = ['Beijing', 'capital', 'China']

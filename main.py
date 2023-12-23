@@ -1,15 +1,16 @@
-from QCmodel import question_classification
 from fact_checking import fact_checking
 from example_using_llm import get_completion
-from assignment.answer_extractor import get_entities, answer_extractor
+from answer_extractor import get_entities, answer_extractor
 from entity_linking import entity_linking, question_entity_linking
 import stanza
 import nltk
+
 nltk.download('punkt')
 
-#modify the input file path
+# modify the input file path
 INPUT_FILE = 'example_input.txt'
 OUTPUT_FILE = 'output.txt'
+
 
 def main():
     # stanza.download('en')
@@ -61,7 +62,7 @@ def main():
                 for entity in entity_question_link:
                     output_file.write(f"{question_id}\tE\"{entity['name']}\"\t\"{entity['link']}\"\n")
             except Exception as e:
-                print(question_id,f"An error occurred: {e}. Skipping this question.")
+                print(question_id, f"An error occurred: {e}. Skipping this question.")
 
 
 def trans_to_doc(ques):
