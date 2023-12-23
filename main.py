@@ -22,7 +22,7 @@ def main():
     # question = "What is the capital of China?"
     with open(INPUT_FILE, 'r') as file:
         questions = file.readlines()
-    with open(OUTPUT_FILE, 'w') as output_file:
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as output_file:
         for q in questions:
             try:
                 q = q.strip()
@@ -63,8 +63,8 @@ def main():
                 # print("question classify:", questionclassify)
                 # print("Correctness of the answer: ",question_id,factcheck)
                 output_file.write(f"{question_id}\tC\"{factcheck}\"\n")
-                for entity in entity_question_link:
-                    output_file.write(f"{question_id}\tE\"{entity['name']}\"\t\"{entity['link']}\"\n")
+                for query in entity_linking_result.keys():
+                    output_file.write(f"{question_id}\tE\"{entity_linking_result[query]['name']}\"\t\"{entity_linking_result[query]['link']}\"\n")
             except Exception as e:
                 print(question_id, f"An error occurred: {e}. Skipping this question.")
 
