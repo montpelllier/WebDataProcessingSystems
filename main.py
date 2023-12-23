@@ -19,7 +19,7 @@ nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentimen
 def main():
     with open(INPUT_FILE, 'r') as file:
         questions = file.readlines()
-    with open(OUTPUT_FILE, 'w', encoding='utf-8') as output_file:
+    # with open(OUTPUT_FILE, 'w', encoding='utf-8') as output_file:
         for q in questions:
             try:
                 q = q.strip()
@@ -27,7 +27,7 @@ def main():
                 answer = get_completion(question)
                 print("question: ", question)
                 print("answer: ", answer)
-                output_file.write(f"{question_id}\tR\"{answer}\"\n")
+                # output_file.write(f"{question_id}\tR\"{answer}\"\n")
                 # question_classify = question_classification(question)
 
                 # fact checking
@@ -39,7 +39,7 @@ def main():
                 entity_question = get_entities(q_doc)
                 entity_question_link = question_entity_linking(q_doc)
                 extracted_answer = extract_answer(q_doc, a_doc)
-                output_file.write(f"{question_id}\tA\"{extracted_answer}\"\n")
+                # output_file.write(f"{question_id}\tA\"{extracted_answer}\"\n")
 
                 # test
                 if extracted_answer == "yes" or extracted_answer == "no":
@@ -51,9 +51,12 @@ def main():
                     print("extracted answer", question_id, extracted_answer, ans_link)
                     factcheck = fact_checking(question, entity_question, entity_question_link, ans_link)
 
-                output_file.write(f"{question_id}\tC\"{factcheck}\"\n")
+                # output_file.write(f"{question_id}\tC\"{factcheck}\"\n")
                 for query in entity_linking_result.keys():
-                    output_file.write(f"{question_id}\tE\"{entity_linking_result[query]['name']}\"\t\"{entity_linking_result[query]['link']}\"\n")
+                    name = entity_linking_result[query]['name']
+                    link = entity_linking_result[query]['link']
+                    print(name, link)
+                    # output_file.write(f"{question_id}\tE\"{entity_linking_result[query]['name']}\"\t\"{entity_linking_result[query]['link']}\"\n")
 
                 print("factcheck: ", factcheck)
             except Exception as e:
