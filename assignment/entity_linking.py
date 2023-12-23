@@ -1,8 +1,8 @@
 import numpy as np
 
-from assignment.KB import *
-from assignment.html_parser import *
-from assignment.sentence_similarity_calculator import cal_sentence_similarity
+from KB import *
+from html_parser import *
+from sentence_similarity_calculator import cal_sentence_similarity
 
 
 def transfer_id2url(wikidata_ent_id):

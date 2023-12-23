@@ -6,8 +6,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.tokenize import sent_tokenize
 
-from assignment.answer_extractor import get_entities
-from assignment.html_parser import *
+from answer_extractor import get_entities
+from html_parser import *
 
 stanza.download('en')  # download English model
 # initialize English neural pipeline
@@ -19,8 +19,6 @@ NIL = {'id': None, 'name': None, 'link': None}
 # 对于每个entity mention，生成一组候选entity
 
 def generate_entity_candidate(entity, num=10):
-    # print("mention:", entity)
-
     S = requests.Session()
 
     PARAMS = {
