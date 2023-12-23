@@ -21,7 +21,8 @@ def main():
     # question = input("Type your question and type ENTER to finish:\n")
     # question = "What is the capital of China?"
     with open(INPUT_FILE, 'r') as file:
-        questions = file.readlines()
+        questions = [line.rstrip() for line in file if line.rstrip()]
+        # questions = file.readlines()
     gt_data = read_output_file(GT_FILE)
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as output_file:
         for q in questions:
