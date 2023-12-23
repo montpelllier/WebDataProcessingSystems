@@ -1,10 +1,9 @@
 import copy
-import string
 
 import stanza
 
-from assignment.question_classifier import *
-from assignment.sentence_similarity_calculator import *
+from question_classifier import *
+from sentence_similarity_calculator import *
 
 # from question_classifier import *
 # from sentence_similarity_calculator import *
