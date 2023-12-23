@@ -10,8 +10,8 @@ nltk.download('punkt')
 nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
 
 # modify the input file path
-INPUT_FILE = 'testdata_input.txt'
-GT_FILE = 'testdata_gt.txt'
+INPUT_FILE = 'testdata20_input.txt'
+GT_FILE = 'testdata20_gt.txt'
 OUTPUT_FILE = 'output.txt'
 
 
@@ -26,52 +26,48 @@ def main():
     gt_data = read_output_file(GT_FILE)
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as output_file:
         for q in questions:
-            try:
+            # try:
                 q = q.strip()
                 question_id, question = q.split('\t')
-                # print("Question ID:", question_id)
-                # print("Question Text:", question)
                 # answer = get_completion(question)
-                llm_answer = gt_data[question_id]['R']
-                answer = llm_answer
-                # print("question", question)
-                # print("Text returned by the language model", question_id, answer)
-                output_file.write(f"{question_id}\tR\"{answer}\"\n")
+                # print("question: ", question)
+                # print("answer: ", answer)
+                # output_file.write(f"{question_id}\tR\"{answer}\"\n")
+                # question_classify = question_classification(question)
 
-                # entity_linking
-                entity_linking_result = entity_linking(question, answer)
-                # questionclassify = question_classification(question)
+                answer =  gt_data[question_id]['R']
 
-                # print("Entities extracted", question_id, entity_linking_result)
-                # factchecking
+                # fact checking
                 q_doc = nlp(question)
                 a_doc = nlp(answer)
+                # entity_linking
+                entity_linking_result = entity_linking(q_doc, a_doc)
+
                 entity_question = get_entities(q_doc)
                 entity_question_link = question_entity_linking(q_doc)
                 extracted_answer = extract_answer(q_doc, a_doc)
-                output_file.write(f"{question_id}\tA\"{extracted_answer}\"\n")
+                # output_file.write(f"{question_id}\tA\"{extracted_answer}\"\n")
 
                 # test
-                # print("q_doc", q_doc)
-                # print("question entity",entity_question)
-                # print("question entity link",question_id,entity_question_link)
                 if extracted_answer == "yes" or extracted_answer == "no":
                     print("extracted answer", question_id, extracted_answer)
                     factcheck = fact_checking(question, entity_question, entity_question_link, extracted_answer)
 
                 else:
-                    ans_link = entity_linking_result[extracted_answer]
+                    ans_link = entity_linking_result[extracted_answer]['link']
                     print("extracted answer", question_id, extracted_answer, ans_link)
                     factcheck = fact_checking(question, entity_question, entity_question_link, ans_link)
-                # print("answer", answer)
-                # print("question classify:", questionclassify)
-                # print("Correctness of the answer: ",question_id,factcheck)
-                output_file.write(f"{question_id}\tC\"{factcheck}\"\n")
+
+                # output_file.write(f"{question_id}\tC\"{factcheck}\"\n")
                 for query in entity_linking_result.keys():
-                    output_file.write(
-                        f"{question_id}\tE\"{entity_linking_result[query]['name']}\"\t\"{entity_linking_result[query]['link']}\"\n")
-            except Exception as e:
-                print(question_id, f"An error occurred: {e}. Skipping this question.")
+                    name = entity_linking_result[query]['name']
+                    link = entity_linking_result[query]['link']
+                    print(name, link)
+                    # output_file.write(f"{question_id}\tE\"{entity_linking_result[query]['name']}\"\t\"{entity_linking_result[query]['link']}\"\n")
+
+                print("factcheck: ", factcheck)
+            # except Exception as e:
+            #     print(question_id, f"An error occurred: {e}. Skipping this question.")
 
     # 读取标准输出和预测输出
     pred_data = read_output_file(OUTPUT_FILE)  # 预测数据
