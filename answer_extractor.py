@@ -1,12 +1,7 @@
 import copy
 
-import stanza
-
 from question_classifier import *
 from sentence_similarity_calculator import *
-
-# from question_classifier import *
-# from sentence_similarity_calculator import *
 
 type_list = ["PERSON", "NORP", "ORG", "GPE", "LOC", ["FAC", "PRODUCT", "WORK_OF_ART", "LAW"], "EVENT", "LANGUAGE",
              "DATE", "PERCENT", "MONEY", "QUANTITY", "ORDINAL", ["CARDINAL", "TIME"]]
@@ -18,17 +13,11 @@ negative_words = ["no", "not", "never", "none", "neither", "nor", "without", "de
 # 选取名词、代词、副词、形容词、动词作为keyword
 key_pos = ["NOUN", "PROPN", "ADJ", "ADV", "VERB"]
 
-stanza.download('en')  # download English model
-# initialize English neural pipeline
-nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
-
 
 def get_entities(doc):
     entities = []
     for sentence in doc.sentences:
-        # print(f"sentence: {sentence.text}") 
         for entity in sentence.ents:
-            # print(f"entity: {entity.text}, type: {entity.type}")
             entities.append(entity.text)
     return entities
 
@@ -88,13 +77,11 @@ def get_ans_entity_candidates(ans_doc, q_ent_type, keywords):
     keywords = {keyword.lower() for keyword in keywords}
     for sentence in ans_doc.sentences:
         for entity in sentence.ents:
-            # print(f"entity: {entity.text}, type: {entity.type}")
             entity_text = str.lower(entity.text)
             # assume answer entity won't appear in the question.
             if entity_text not in keywords:
                 type_score = get_type_score(entity.type, q_ent_type)
                 distance_score = cal_distance_score(sentence, keywords, entity)
-                # print(type_score, distance_score)
                 candidates.append((entity.text, type_score + distance_score))
 
     return candidates
@@ -124,12 +111,6 @@ def extract_boolean_answer(question, ans_doc):
                     elif word_score != 0:
                         sentence_score *= word_score
             ans_score += sentence_score * similarities[i]
-    # if sentence_score > 0:  # positive
-    # 	ans_score += similarities[i]
-    # elif sentence_score < 0:  # negative
-    # 	ans_score -= similarities[i]
-    # print(ans_score)
-    # final_ans = "not given"
 
     # assume positive if no obvious negative expression
     if ans_score >= 0:
@@ -177,68 +158,3 @@ def extract_answer(ques_doc, ans_doc):
         # boolean question. use keyword
         print("type: boolean question")
         return extract_boolean_answer(question, ans_doc)
-
-
-# if __name__ == "__main__":
-#     # test
-#     stanza.download('en')  # download English model
-#     # initialize English neural pipeline
-#     nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
-
-
-#     def test(ques, ans):
-#         print("question:", ques)
-#         print("answer:", ans)
-#         a_doc = nlp(ans)
-#         q_doc = nlp(ques)
-#         print(f"extracted: {extract_answer(q_doc, a_doc)}\n")
-
-
-    # q = "Is Rome the capital of Italy?"
-    # a = (
-    #     "surely it is but many don’t know this fact that Italy was not always called as Italy. Before Italy came "
-    #     "into being in 1861, it had several names including Italian Kingdom, Roman Empire and the Republic of "
-    #     "Italy among others. If we start the chronicle back in time, then Rome was the first name to which Romans "
-    #     "were giving credit. Later this city became known as “Caput Mundi” or the capital of the world...")
-    # test(q, a)
-    #
-    # q = "Managua is not the capital of Nicaragua. Yes or no?"
-    # a = ("Most people think Managua is the capital of Nicaragua. However, Managua is not the capital of Nicaragua. The "
-    #      "capital of Nicaragua is Managua. The capital of Nicaragua is Managua. Managua is the capital of Nicaragua. "
-    #      "The capital")
-    # test(q, a)
-    #
-    # q = "sky isn't blue, right?"
-    # a = ("The statement \"the sky isn't blue\" is not accurate. The Earth's atmosphere, particularly the gases and "
-    #      "particles in the air, scatters sunlight, making the sky appear blue. This phenomenon is known as Rayleigh "
-    #      "scattering, named after Lord Rayleigh, who first described it in the late 19th century. The blue color we "
-    #      "see in the sky is a result of the scattering of sunlight by the tiny molecules of gases in the atmosphere, "
-    #      "such as nitrogen and oxygen. The shorter, blue wavelengths are scattered in all directions, while the "
-    #      "longer, red wavelengths pass straight through the atmosphere with little scattering, which is why the sky "
-    #      "typically appears blue during the daytime. It's worth noting that the color of the sky can change depending "
-    #      "on the time of day and atmospheric conditions. For example, during sunrise and sunset, the sky can take on "
-    #      "hues of red, orange, and pink, due to the scattering of light by atmospheric particles. However, "
-    #      "the blue color of the sky remains a constant feature of the Earth's atmosphere under normal conditions.")
-    # test(q, a)
-    #
-    q = "the capital of nicaragua is..."
-    a = ("Prior to 1979, Nicaragua was known as the Republic of Nicaragua. It is a republic with a presidential system "
-         "of government. The capital of Nicaragua is Managua. The capital of Nicaragua is Managua. What is the capital "
-         "of nicar")
-    test(q, a)
-    #
-    # q = "who was the first president of the Netherlands?"
-    # a = ("The first president of the Netherlands was Queen Wilhelmina, who served from 1890 to 1943. She was the first "
-    #      "monarch to be appointed as president of the Netherlands, and she played a significant role in the country's "
-    #      "history, particularly during World War II.")
-    # test(q, a)
-    # q = "Is Rome the capital of Italy?"
-    # q_doc = nlp(q)
-    # print(get_entities(q_doc))
-
-
-def answer_extractor(question, answer):
-    q_doc = nlp(question)
-    a_doc = nlp(answer)
-    # print(f"extracted: {extract_answer(q_doc, a_doc)}\n")
-    return extract_answer(q_doc, a_doc)

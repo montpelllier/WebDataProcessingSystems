@@ -1,19 +1,20 @@
 from sklearn.metrics import accuracy_score, f1_score
 
-
 from QCmodel import question_classification
 from fact_checking import fact_checking
 from example_using_llm import get_completion
-from assignment.answer_extractor import get_entities, answer_extractor
+from answer_extractor import get_entities, answer_extractor
 from entity_linking import entity_linking, question_entity_linking
 import stanza
 import nltk
+
 nltk.download('punkt')
 
-#modify the input file path
+# modify the input file path
 INPUT_FILE = 'testdata_input.txt'
 GT_FILE = 'testdata_gt.txt'
 OUTPUT_FILE = 'output.txt'
+
 
 def main():
     # stanza.download('en')
@@ -68,8 +69,8 @@ def main():
                 for entity in entity_question_link:
                     output_file.write(f"{question_id}\tE\"{entity['name']}\"\t\"{entity['link']}\"\n")
             except Exception as e:
-                print(question_id,f"An error occurred: {e}. Skipping this question.")
-    
+                print(question_id, f"An error occurred: {e}. Skipping this question.")
+
     # 读取标准输出和预测输出
     pred_data = read_output_file(OUTPUT_FILE)  # 预测数据
 
@@ -83,13 +84,10 @@ def main():
     print(f"E:F1 Score: {f1}")
 
 
-
 def trans_to_doc(ques):
     nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentiment', download_method=None)
     q_doc = nlp(ques)
     return q_doc
-
-
 
 
 def read_output_file(filename):
@@ -101,16 +99,16 @@ def read_output_file(filename):
             lines = block.strip().split('\n')
             question_id = None
             record = {'R': None, 'A': None, 'C': None, 'E': []}
-            
+
             for line in lines:
                 parts = line.split()
                 if not parts:
                     continue  # Skip empty lines
-                
+
                 # 获取问题ID
                 if question_id is None:
                     question_id = parts[0]
-                
+
                 # 根据行的开始标记处理数据
                 if line.startswith(question_id + " R"):
                     record['R'] = line[len(question_id) + 3:].strip('"')
@@ -121,10 +119,11 @@ def read_output_file(filename):
                 elif line.startswith(question_id + " E"):
                     entity, link = line[len(question_id) + 3:].split('\t')
                     record['E'].append((entity.strip('"'), link.strip('"')))
-            
+
             if question_id:
                 data[question_id] = record
     return data
+
 
 def calculate_metrics_forC(true_data, pred_data):
     """计算准确率和F1分数。"""
@@ -134,11 +133,12 @@ def calculate_metrics_forC(true_data, pred_data):
         if qid in pred_data:
             true_labels.append(true_data[qid]['C'])
             pred_labels.append(pred_data[qid]['C'])
-    
+
     accuracy = accuracy_score(true_labels, pred_labels)
     f1 = f1_score(true_labels, pred_labels, pos_label="correct")
 
     return accuracy, f1
+
 
 def evaluate_entities_forE(true_data, pred_data):
     # 初始化计数器
@@ -153,7 +153,6 @@ def evaluate_entities_forE(true_data, pred_data):
             pred_entities = set((e[0], e[1]) for e in pred_data[qid]['E'])
         else:
             pred_entities = set()
-
 
         # 计算真正例、假正例和假负例
         true_positives += len(true_entities & pred_entities)
