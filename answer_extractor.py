@@ -72,12 +72,14 @@ def get_type_score(entity_type, question_type):
     return 3 if entity_type == question_type else 0
 
 
-def get_ans_entity_candidates(ans_doc, q_ent_type, keywords):
+def get_ans_entity_candidates(ans_doc, q_ent_type, keywords, entity_linking):
     candidates = []
     keywords = {keyword.lower() for keyword in keywords}
     for sentence in ans_doc.sentences:
         for entity in sentence.ents:
             entity_text = str.lower(entity.text)
+            if entity.text not in entity_linking.keys():
+                continue
             # assume answer entity won't appear in the question.
             if entity_text not in keywords:
                 type_score = get_type_score(entity.type, q_ent_type)
@@ -126,14 +128,14 @@ def get_ent_type(question):
     return type_list[ent_type]
 
 
-def extract_entity_answer(ques_doc, ans_doc, ent_type):
+def extract_entity_answer(ques_doc, ans_doc, ent_type, entity_linking):
     # use word type, similarity to question, distance to keywords
 
     # get keywords from question
     keywords = extract_keywords(ques_doc)
     # print("keywords:", keywords)
     # select candidate entities with type score and distance score.
-    candidates = get_ans_entity_candidates(ans_doc, ent_type, keywords)
+    candidates = get_ans_entity_candidates(ans_doc, ent_type, keywords, entity_linking)
     if not candidates:
         return None
 
@@ -147,13 +149,13 @@ def extract_entity_answer(ques_doc, ans_doc, ent_type):
     return entity[0]
 
 
-def extract_answer(ques_doc, ans_doc):
+def extract_answer(ques_doc, ans_doc, entity_linking):
     question = ques_doc.text
     question_type = classify_question(question)
     if question_type == 0:
         # open question. select from entity candidates
         print("type: entity question")
-        return extract_entity_answer(ques_doc, ans_doc, get_ent_type(question))
+        return extract_entity_answer(ques_doc, ans_doc, get_ent_type(question), entity_linking)
     else:
         # boolean question. use keyword
         print("type: boolean question")

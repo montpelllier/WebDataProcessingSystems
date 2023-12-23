@@ -39,7 +39,7 @@ def main():
 
                 entity_question = get_entities(q_doc)
                 entity_question_link = question_entity_linking(q_doc)
-                extracted_answer = extract_answer(q_doc, a_doc)
+                extracted_answer = extract_answer(q_doc, a_doc, entity_linking_result)
                 # output_file.write(f"{question_id}\tA\"{extracted_answer}\"\n")
 
                 # test

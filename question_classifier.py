@@ -48,7 +48,7 @@ def classify_entity_question(question):
     # ORDINAL(42)
     # CARDINAL (others), TIME ()
     MODEL_NAME = 'bert-base-cased'
-    MODEL_PATH = 'model/transformers' + "/" + MODEL_NAME
+    MODEL_PATH = 'model/transformers/' + MODEL_NAME
     path = transfer_relative_path(MODEL_PATH)
 
     model = AutoModelForSequenceClassification.from_pretrained(path)
