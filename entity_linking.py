@@ -2,9 +2,9 @@ import re
 
 import stanza
 from Levenshtein import distance as levenshtein
+from nltk.tokenize import sent_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from nltk.tokenize import sent_tokenize
 
 from answer_extractor import get_entities
 from html_parser import *
@@ -41,7 +41,6 @@ def generate_entity_candidate(entity, num=10):
                 {'id': candidate['id'], 'name': candidate['display']['label']['value'], 'link': wikipedia_link})
         else:
             candidate_list.remove(candidate)
-    # print(candidate_final_list)
     return candidate_final_list
 
 
@@ -68,55 +67,20 @@ def get_wikipedia_link(candidate):
     return wikipedia_url
 
 
-# 查询entity在Wikipedia被链接的次数,时间太长了
-# def get_entity_popularity(wikipedia_link):
-#     session = requests.Session()
-#     PARAMETERS = {
-#         "action": "query",
-#         "format": "json",
-#         "list": "backlinks",
-#         "bltitle": wikipedia_link,
-#         "bllimit": "max"
-#     }
-
-#     response = session.get(url=URL, params=PARAMETERS)
-#     data = response.json()
-
-#     backlinks = data['query']['backlinks']  # Find all pages that link to the given page.
-
-#     # #解析http页面链接
-#     # response = requests.get(wikipedia_link)
-#     # soup = BeautifulSoup(response.text, 'html.parser')
-#     # backlinks = soup.select('a[class="mw-redirect"]')
-#     link_count = len(backlinks)
-#     print(link_count)
-#     # 如果有更多的反向链接，继续查询
-#     while 'continue' in data:  # 但耗时
-#         PARAMETERS['blcontinue'] = data['continue']['blcontinue']
-#         response = session.get(url=URL, params=PARAMETERS)
-#         data = response.json()
-#         backlinks.extend(data['query']['backlinks'])
-#         link_count += len(data['query']['backlinks'])
-#         print(link_count)
-#     return link_count
-
-
 def candidates_ranking(candidates_list, mention, context):
     score = []
     for candidate in candidates_list:
-        # wikipedia_link = candidate['link']
         name = candidate['name']
 
         content = get_candidate_context(candidate)
-        # print(content)
         candidate_context = extract_content_with_entity(content, mention)
+
         similarity = compute_similarity_bow(candidate_context, context)
         string_match_score = levenshtein_distance(mention, name)
 
         overall = 0.6 * similarity + 0.4 * string_match_score
         score.append(overall)
-        # print("score:", overall)
-    # 排序
+    # sort
     max_value = max(score)
     max_index = score.index(max_value)
 
@@ -127,13 +91,10 @@ def extract_content_with_entity(content, entity, max_n=1):
     """
     extract sentences containing keywords
     """
-    # print(content)
     sentences = sent_tokenize(content)
-    # print(sentences)
     selected_sentences = ""
     n = 0
     for sent in sentences:
-        # print(sent)
         if str.lower(entity) in str.lower(sent):
             n += 1
             selected_sentences += sent + " "
@@ -142,7 +103,6 @@ def extract_content_with_entity(content, entity, max_n=1):
 
     # Remove trailing space
     selected_sentences = selected_sentences.strip()
-    # print(selected_sentences)
     return selected_sentences
 
 
@@ -216,34 +176,20 @@ def link_entity(sentences, entity):
 # select = candidates_ranking(candidates_list, "nicaragua", context)
 
 
-def entity_linking(question, answer):
-    q = question
-    a = answer
-
-    q_doc = nlp(q)
-    a_doc = nlp(a)
+def entity_linking(q_doc, a_doc):
     sentences = q_doc.sentences + a_doc.sentences
-
     ents = set(get_entities(q_doc) + get_entities(a_doc))
-
     entity_map = {}
     for ent in ents:
         if ent not in entity_map.keys():
             entity_map[ent] = link_entity(sentences, ent)
-    # print("entity_map:", entity_map)
     return entity_map
 
 
-def question_entity_linking(question):
-    q_doc = question
+def question_entity_linking(q_doc):
     ents = set(get_entities(q_doc))
     q_link = []
     for ent in ents:
         link = link_entity(q_doc.sentences, ent)
         q_link.append(link['link'])
     return q_link
-
-    # return link_entity(q_doc.sentences, ent)
-# question_entity_linking("Managua is not the capital of Nicaragua. Yes or no?")
-
-

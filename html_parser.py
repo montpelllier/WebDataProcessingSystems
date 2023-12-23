@@ -40,6 +40,8 @@ def get_wikipedia_page_content(soup):
     for paragraph in paragraphs:
         if len(paragraph.get_text()) >= 50:
             paragraph_texts.append(paragraph.get_text())
+        if len(paragraph_texts) >= 20:
+            break
 
     return paragraph_texts
 
