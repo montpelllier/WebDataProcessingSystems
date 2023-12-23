@@ -18,7 +18,8 @@ nlp = stanza.Pipeline(lang='en', processors='tokenize,ner,mwt,pos,lemma,sentimen
 
 def main():
     with open(INPUT_FILE, 'r') as file:
-        questions = file.readlines()
+        # questions = file.readlines()
+        questions = [line.rstrip() for line in file if line.rstrip()]
     # with open(OUTPUT_FILE, 'w', encoding='utf-8') as output_file:
         for q in questions:
             try:
