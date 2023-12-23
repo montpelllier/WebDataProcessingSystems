@@ -1,0 +1,60 @@
+question-001	Is Paris the capital of France?
+question-002	Who wrote "1984"?
+question-003	What is the largest ocean on Earth?
+question-004	Is the sun a star or a planet?
+question-005	Who was the first woman to win a Nobel Prize?
+question-006	Where are the Pyramids of Giza?
+question-007	What is the main ingredient in guacamole?
+question-008	Who painted the Mona Lisa?
+question-009	What is the smallest planet in our solar system?
+question-010	What language is spoken in Brazil?
+question-011	What is the capital of Japan?
+question-012	Who discovered penicillin?
+question-013	What is the chemical symbol for gold?
+question-014	What year did World War II end?
+question-015	Who is known as the father of computers?
+question-016	What is the largest desert in the world?
+question-017	Who wrote the play "Romeo and Juliet"?
+question-018	What is the speed of light?
+question-019	What currency is used in the United Kingdom?
+question-020	Who painted "Starry Night"?
+question-021	Who is the CEO of Tesla?
+question-022	What is the capital of Australia?
+question-023	Where was William Shakespeare born?
+question-024	What element is represented by the symbol 'O'?
+question-025	Who wrote the music for the opera 'The Magic Flute'?
+question-026	What is the longest river in the world?
+question-027	When was the United Nations founded?
+question-028	Who is known as the 'Maid of Orleans'?
+question-029	What is the hardest natural substance on Earth?
+question-030	Where is the ancient city of Petra located?
+question-031	What is the main language spoken in Egypt?
+question-032	Who discovered gravity?
+question-033	What is the currency of India?
+question-034	What is the formula for water?
+question-035	Who painted the 'Last Supper'?
+question-036	What animal is known as the 'King of the Jungle'?
+question-037	Where is the Sistine Chapel located?
+question-038	Who was the first president of the United States?
+question-039	What is the largest planet in our solar system?
+question-040	Where is the Colosseum situated?
+question-041	What is the boiling point of water at sea level?
+question-042	Who wrote the novel 'Moby Dick'?
+question-043	What is the main ingredient in chocolate?
+question-044	Where is Mount Everest located?
+question-045	Who composed the Four Seasons concertos?
+question-046	What is the national flower of Japan?
+question-047	When was the internet invented?
+question-048	Who is known as the 'Father of Geometry'?
+question-049	What currency is used in Canada?
+question-050	Where was Leonardo da Vinci born?
+question-051	What is the pH of pure water?
+question-052	Who discovered America?
+question-053	What is the largest mammal in the world?
+question-054	Where is the Louvre Museum located?
+question-055	Who is the author of 'Les Misérables'?
+question-056	What is the capital of Egypt?
+question-057	Who painted the 'Girl with a Pearl Earring'?
+question-058	What is the speed of sound?
+question-059	Who invented the telephone?
+question-060	What is the largest continent on Earth?
